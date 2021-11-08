@@ -25,7 +25,7 @@ import gameobjects
 import maps
 
 #-- Constants
-FRAMERATE = 50
+FRAMERATE = 60
 
 #-- Variables
 #   Define the current level
@@ -36,6 +36,13 @@ tanks_list          = []
 
 #-- Resize the screen to the size of the current level
 screen = pygame.display.set_mode(current_map.rect().size)
+
+#set barriers
+static_body = space.static_body
+space.add(pymunk.Segment(static_body, (0,0), (current_map.width,0), 0.0))
+space.add(pymunk.Segment(static_body, (0,0), (0,current_map.height), 0.0))
+space.add(pymunk.Segment(static_body, (current_map.width,0), (current_map.width,current_map.height), 0.0))
+space.add(pymunk.Segment(static_body, (0,current_map.height), (current_map.width,current_map.height), 0.0))
 
 #-- Generate the background
 background = pygame.Surface(screen.get_size())
@@ -67,16 +74,19 @@ for x in range(0, current_map.width):
 for i in range(0, len(current_map.start_positions)):
     # Get the starting position of the tank "i"
     pos = current_map.start_positions[i]
+    #create bases
+    base = gameobjects.GameVisibleObject(pos[0], pos[1], images.bases[i])
     # Create the tank, images.tanks contains the image representing the tank
     tank = gameobjects.Tank(pos[0], pos[1], pos[2], images.tanks[i], space)
     # Add the tank to the list of tanks
 
     tanks_list.append(tank)
-    print(pos[0], pos[1], pos[2])
-
+    game_objects_list.append(base)
+    game_objects_list.append(tank)
 
 #-- Create the flag
 flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
+game_objects_list.append(flag)
 
 
 #----- Main Loop -----#
@@ -94,11 +104,32 @@ while running:
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             running = False
         if event.type == KEYDOWN:
+            if event.key == K_w:
+                tanks_list[1].accelerate()
+            elif event.key == K_s:
+                tanks_list[1].decelerate()
+            elif event.key == K_d:
+                tanks_list[1].turn_right()
+            elif event.key == K_a:
+                tanks_list[1].turn_left()
             if event.key == K_UP:
                 tanks_list[0].accelerate()
             elif event.key == K_DOWN:
                 tanks_list[0].decelerate()
+            elif event.key == K_RIGHT:
+                tanks_list[0].turn_right()
+            elif event.key == K_LEFT:
+                tanks_list[0].turn_left()
+        if event.type == KEYUP:
+            tanks_list[0].stop_moving()
+            tanks_list[0].stop_turning()
+            tanks_list[1].stop_moving()
+            tanks_list[1].stop_turning()
 
+    tanks_list[0].try_grab_flag(flag)
+    tanks_list[1].try_grab_flag(flag)
+    if tanks_list[0].has_won():
+        running = False
 
 
 
@@ -133,8 +164,6 @@ while running:
 
 
     # Update the display of the game objects on the screen
-    for tank in tanks_list:
-        tank.update_screen(screen)
 
 
     #   Redisplay the entire screen (see double buffer technique)
