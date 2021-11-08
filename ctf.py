@@ -37,13 +37,47 @@ tanks_list          = []
 #-- Resize the screen to the size of the current level
 screen = pygame.display.set_mode(current_map.rect().size)
 
-#<INSERT GENERATE BACKGROUND>
+#-- Generate the background
+background = pygame.Surface(screen.get_size())
 
-#<INSERT CREATE BOXES>
+#   Copy the grass tile all over the level area
+for x in range(0, current_map.width):
+    for y in range(0,  current_map.height):
+        # The call to the function "blit" will copy the image
+        # contained in "images.grass" into the "background"
+        # image at the coordinates given as the second argument
+        background.blit(images.grass,  (x*images.TILE_SIZE, y*images.TILE_SIZE))
 
-#<INSERT CREATE TANKS>
 
-#<INSERT CREATE FLAG>
+#-- Create the boxes
+for x in range(0, current_map.width):
+    for y in range(0,  current_map.height):
+        # Get the type of boxes
+        box_type  = current_map.boxAt(x, y)
+        # If the box type is not 0 (aka grass tile), create a box
+        if(box_type != 0):
+            # Create a "Box" using the box_type, aswell as the x,y coordinates,
+            # and the pymunk space
+            box = gameobjects.get_box_with_type(x, y, box_type, space)
+            game_objects_list.append(box)
+
+
+#-- Create the tanks
+# Loop over the starting poistion
+for i in range(0, len(current_map.start_positions)):
+    # Get the starting position of the tank "i"
+    pos = current_map.start_positions[i]
+    # Create the tank, images.tanks contains the image representing the tank
+    tank = gameobjects.Tank(pos[0], pos[1], pos[2], images.tanks[i], space)
+    # Add the tank to the list of tanks
+
+    tanks_list.append(tank)
+    print(pos[0], pos[1], pos[2])
+
+
+#-- Create the flag
+flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
+
 
 #----- Main Loop -----#
 
@@ -59,6 +93,17 @@ while running:
         # close button of the wiendow) or if the user press the escape key.
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
             running = False
+        if event.type == KEYDOWN:
+            if event.key == K_UP:
+                tanks_list[0].accelerate()
+            elif event.key == K_DOWN:
+                tanks_list[0].decelerate()
+
+
+
+
+
+
     #-- Update physics
     if skip_update == 0:
         # Loop over all the game objects and update their speed in function of their
@@ -76,11 +121,21 @@ while running:
     for obj in game_objects_list:
         obj.post_update()
 
+
     #-- Update Display
 
-    #<INSERT DISPLAY BACKGROUND>
+    # Display the background on the screen
+    screen.blit(background, (0, 0))
 
-    #<INSERT DISPLAY OBJECTS>
+
+    for obj in game_objects_list:
+        obj.update_screen(screen)
+
+
+    # Update the display of the game objects on the screen
+    for tank in tanks_list:
+        tank.update_screen(screen)
+
 
     #   Redisplay the entire screen (see double buffer technique)
     pygame.display.flip()
