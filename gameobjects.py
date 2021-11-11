@@ -221,7 +221,8 @@ class Tank(GamePhysicsObject):
 
     def shoot(self, space):
         """ Call this function to shoot a missile (current implementation does nothing ! you need to implement it yourself) """
-        return
+        print(self.body.position[0])
+        return Bullet(self.body.position[0], self.body.position[1], math.degrees(self.body.angle), images.bullet, space)
 
 
 class Box(GamePhysicsObject):
@@ -266,3 +267,31 @@ class Flag(GameVisibleObject):
     def __init__(self, x, y):
         self.is_on_tank   = False
         super().__init__(x, y,  images.flag)
+
+class Bullet(GamePhysicsObject):
+    ACCELERATION = 0
+    NORMAL_MAX_SPEED = 10
+    VELOCITY = 10
+
+    def __init__(self, x, y, orientation, sprite, space):
+        super().__init__(x, y, orientation, sprite, space, True)
+        self.acceleration = 1 # 1 forward, 0 for stand still, -1 for backwards
+        self.max_speed = Bullet.NORMAL_MAX_SPEED
+        self.VELOCITY = 5
+    def update(self):
+        """ A function to update the objects coordinates. Gets called at every tick of the game. """
+
+        # Creates a vector in the direction we want accelerate / decelerate
+        acceleration_vector = pymunk.Vec2d(0, self.VELOCITY).rotated(self.body.angle)
+        # Applies the vector to our velocity
+        self.body.velocity += acceleration_vector
+
+        # Makes sure that we dont exceed our speed limit
+        velocity = clamp(self.max_speed, self.body.velocity.length)
+        self.body.velocity = pymunk.Vec2d(velocity, 0).rotated(self.body.velocity.angle)
+
+        # Updates the rotation
+        self.body.angular_velocity = 0
+
+    def bullet_collided():
+        pass

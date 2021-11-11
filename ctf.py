@@ -69,7 +69,7 @@ for x in range(0, current_map.width):
             game_objects_list.append(box)
 
 
-#-- Create the tanks
+#-- Create the tanks/bases
 # Loop over the starting poistion
 for i in range(0, len(current_map.start_positions)):
     # Get the starting position of the tank "i"
@@ -88,7 +88,6 @@ for i in range(0, len(current_map.start_positions)):
 flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
 game_objects_list.append(flag)
 
-
 #----- Main Loop -----#
 
 #-- Control whether the game run
@@ -106,30 +105,41 @@ while running:
         if event.type == KEYDOWN:
             if event.key == K_w:
                 tanks_list[1].accelerate()
-            elif event.key == K_s:
+            if event.key == K_s:
                 tanks_list[1].decelerate()
-            elif event.key == K_d:
+            if event.key == K_d:
                 tanks_list[1].turn_right()
-            elif event.key == K_a:
+            if event.key == K_a:
                 tanks_list[1].turn_left()
             if event.key == K_UP:
                 tanks_list[0].accelerate()
-            elif event.key == K_DOWN:
+            if event.key == K_DOWN:
                 tanks_list[0].decelerate()
-            elif event.key == K_RIGHT:
+            if event.key == K_RIGHT:
                 tanks_list[0].turn_right()
-            elif event.key == K_LEFT:
+            if event.key == K_LEFT:
                 tanks_list[0].turn_left()
         if event.type == KEYUP:
-            tanks_list[0].stop_moving()
-            tanks_list[0].stop_turning()
-            tanks_list[1].stop_moving()
-            tanks_list[1].stop_turning()
+            if (event.key == K_DOWN or event.key == K_UP):
+                tanks_list[0].stop_moving()
+            if (event.key == K_RIGHT or event.key == K_LEFT):
+                tanks_list[0].stop_turning()
+            if (event.key == K_w or event.key == K_s):
+                tanks_list[1].stop_moving()
+            if (event.key == K_d or event.key == K_a):
+                tanks_list[1].stop_turning()
+        if event.type == KEYDOWN:
+            if event.key == K_RSHIFT:
+                bullet = tanks_list[0].shoot(space)
+                game_objects_list.append(bullet)
 
     tanks_list[0].try_grab_flag(flag)
     tanks_list[1].try_grab_flag(flag)
     if tanks_list[0].has_won():
         running = False
+
+
+
 
 
 
