@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/youdr728/tdde25/ctf-env"
+set -gx VIRTUAL_ENV "/home/zaish381/Documents/År1/HT1/tdde25-2021-projekt-sg4-u-05/ctf-env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

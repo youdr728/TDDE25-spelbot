@@ -141,11 +141,16 @@ class Tank(GamePhysicsObject):
         # Define variable used to apply motion to the tanks
         self.acceleration = 0 # 1 forward, 0 for stand still, -1 for backwards
         self.rotation = 0 # 1 clockwise, 0 for no rotation, -1 counter clockwise
+        self.shape.parent = self    
+        self.shape.collision_type = 2
+        
+
 
 
         self.flag                 = None                      # This variable is used to access the flag object, if the current tank is carrying the flag
         self.max_speed        = Tank.NORMAL_MAX_SPEED     # Impose a maximum speed to the tank
         self.start_position       = pymunk.Vec2d(x, y)        # Define the start position, which is also the position where the tank has to return with the flag
+
 
     def accelerate(self):
         """ Call this function to make the tank move forward. """
@@ -172,6 +177,7 @@ class Tank(GamePhysicsObject):
         """ Call this function to make the tank stop turning. """
         self.rotation = 0
         self.body.angular_velocity = 0
+
 
     def update(self):
         """ A function to update the objects coordinates. Gets called at every tick of the game. """
@@ -231,7 +237,10 @@ class Box(GamePhysicsObject):
     def __init__(self, x, y, sprite, movable, space, destructable):
         """ It takes as arguments the coordinate of the starting position of the box (x,y) and the box model (boxmodel). """
         super().__init__(x, y, 0, sprite, space, movable)
+        self.type = sprite
         self.destructable = destructable
+        self.shape.parent = self
+        self.shape.collision_type = 3
 
 def get_box_with_type(x, y, type, space):
     (x, y) = (x + 0.5, y + 0.5) # Offsets the coordinate to the center of the tile
@@ -269,15 +278,15 @@ class Flag(GameVisibleObject):
         super().__init__(x, y,  images.flag)
 
 class Bullet(GamePhysicsObject):
-    ACCELERATION = 0
-    NORMAL_MAX_SPEED = 10
-    VELOCITY = 10
 
     def __init__(self, x, y, orientation, sprite, space):
         super().__init__(x, y, orientation, sprite, space, True)
         self.acceleration = 1 # 1 forward, 0 for stand still, -1 for backwards
-        self.max_speed = Bullet.NORMAL_MAX_SPEED
         self.VELOCITY = 5
+        self.shape.parent = self
+        self.shape.collision_type = 1
+        
+
     def update(self):
         """ A function to update the objects coordinates. Gets called at every tick of the game. """
 
@@ -287,11 +296,12 @@ class Bullet(GamePhysicsObject):
         self.body.velocity += acceleration_vector
 
         # Makes sure that we dont exceed our speed limit
-        velocity = clamp(self.max_speed, self.body.velocity.length)
+        velocity = self.VELOCITY
         self.body.velocity = pymunk.Vec2d(velocity, 0).rotated(self.body.velocity.angle)
 
         # Updates the rotation
         self.body.angular_velocity = 0
+
 
     def bullet_collided():
         pass

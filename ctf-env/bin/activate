@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/youdr728/tdde25/ctf-env"
+VIRTUAL_ENV="/home/zaish381/Documents/År1/HT1/tdde25-2021-projekt-sg4-u-05/ctf-env"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

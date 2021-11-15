@@ -25,7 +25,7 @@ import gameobjects
 import maps
 
 #-- Constants
-FRAMERATE = 60
+FRAMERATE = 144
 
 #-- Variables
 #   Define the current level
@@ -33,9 +33,82 @@ current_map         = maps.map0
 #   List of all game objects
 game_objects_list   = []
 tanks_list          = []
-
+bullet_list         = []
+box_list            = []
 #-- Resize the screen to the size of the current level
 screen = pygame.display.set_mode(current_map.rect().size)
+
+def collision_bullet_box(arb, space, data):
+    box = arb.shapes[0]
+    bullet = arb.shapes[1]
+    
+    if box.parent.destructable:
+        if bullet.parent in game_objects_list:
+            bullet_list.remove(bullet.parent)
+            box_list.remove(box.parent)
+            game_objects_list.remove(bullet.parent)
+            game_objects_list.remove(box.parent)
+            space.remove(bullet, bullet.body)
+            space.remove(box, box.body)
+    else:
+        if bullet.parent in game_objects_list:
+            bullet_list.remove(bullet.parent)
+            game_objects_list.remove(bullet.parent)
+            space.remove(bullet, bullet.body)
+        
+    return False
+
+handler = space.add_collision_handler(7, 1)
+handler.pre_solve = collision_bullet_box
+
+def collision_bullet_tank(arb, space, data):
+    tank = arb.shapes[0]
+    bullet = arb.shapes[1]
+    
+    if bullet.parent in game_objects_list:
+        bullet_list.remove(bullet.parent)
+        game_objects_list.remove(bullet.parent)
+        space.remove(bullet, bullet.body)
+        tank.body.position=tank.parent.start_position
+        
+    return False
+
+handler = space.add_collision_handler(2, 1)
+handler.pre_solve = collision_bullet_tank
+
+def collision_bullet_bullet(arb, space, data):
+    bullet = arb.shapes[0]
+    if bullet.parent in game_objects_list:
+        bullet_list.remove(bullet.parent)
+        game_objects_list.remove(bullet.parent)
+    space.remove(bullet, bullet.body)
+    
+
+
+    """if bullet.parent in game_objects_list:
+        bullet_list.remove(bullet1.parent)
+        game_objects_list.remove(bullet1.parent)
+        space.remove(bullet, bullet1.body)
+        bullet_list.remove(bullet2.parent)
+        game_objects_list.remove(bullet2.parent)
+        space.remove(bullet, bullet2.body)"""
+        
+    return False
+
+handler = space.add_collision_handler(1, 0)
+handler.pre_solve = collision_bullet_bullet
+
+def collision_bullet_barrier(arb, space, data):
+    bullet = arb.shapes[0]
+    if bullet.parent in game_objects_list:
+        bullet_list.remove(bullet.parent)
+        game_objects_list.remove(bullet.parent)
+    space.remove(bullet, bullet.body)
+        
+    return False
+
+handler = space.add_collision_handler(1, 0)
+handler.pre_solve = collision_bullet_barrier
 
 #set barriers
 static_body = space.static_body
@@ -43,6 +116,8 @@ space.add(pymunk.Segment(static_body, (0,0), (current_map.width,0), 0.0))
 space.add(pymunk.Segment(static_body, (0,0), (0,current_map.height), 0.0))
 space.add(pymunk.Segment(static_body, (current_map.width,0), (current_map.width,current_map.height), 0.0))
 space.add(pymunk.Segment(static_body, (0,current_map.height), (current_map.width,current_map.height), 0.0))
+
+
 
 #-- Generate the background
 background = pygame.Surface(screen.get_size())
@@ -67,6 +142,7 @@ for x in range(0, current_map.width):
             # and the pymunk space
             box = gameobjects.get_box_with_type(x, y, box_type, space)
             game_objects_list.append(box)
+            box_list.append(box)
 
 
 #-- Create the tanks/bases
@@ -132,6 +208,15 @@ while running:
             if event.key == K_RSHIFT:
                 bullet = tanks_list[0].shoot(space)
                 game_objects_list.append(bullet)
+                bullet_list.append(bullet)
+            if event.key == K_RCTRL:
+                bullet = tanks_list[1].shoot(space)
+                game_objects_list.append(bullet)
+                bullet_list.append(bullet)
+            if event.key == K_c:
+                pass
+            if event.key == K_x:
+                pass    
 
     tanks_list[0].try_grab_flag(flag)
     tanks_list[1].try_grab_flag(flag)
@@ -156,6 +241,8 @@ while running:
         skip_update -= 1
 
     #   Check collisions and update the objects position
+    handler = space.add_collision_handler(1, 2)
+
     space.step(1 / FRAMERATE)
 
     #   Update object that depends on an other object position (for instance a flag)
@@ -171,6 +258,7 @@ while running:
 
     for obj in game_objects_list:
         obj.update_screen(screen)
+
 
 
     # Update the display of the game objects on the screen
