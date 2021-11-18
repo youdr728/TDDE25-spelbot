@@ -25,7 +25,7 @@ import gameobjects
 import maps
 
 #-- Constants
-FRAMERATE = 144
+FRAMERATE = 60
 
 #-- Variables
 #   Define the current level
@@ -35,6 +35,9 @@ game_objects_list   = []
 tanks_list          = []
 bullet_list         = []
 box_list            = []
+starttime           = []
+reloadstatus        = []
+
 #-- Resize the screen to the size of the current level
 screen = pygame.display.set_mode(current_map.rect().size)
 
@@ -58,7 +61,7 @@ def collision_bullet_box(arb, space, data):
         
     return False
 
-handler = space.add_collision_handler(7, 1)
+handler = space.add_collision_handler(3, 1)
 handler.pre_solve = collision_bullet_box
 
 def collision_bullet_tank(arb, space, data):
@@ -70,6 +73,8 @@ def collision_bullet_tank(arb, space, data):
         game_objects_list.remove(bullet.parent)
         space.remove(bullet, bullet.body)
         tank.body.position=tank.parent.start_position
+    if tank.parent.flag == flag:
+        gameobjects.Tank.drop_flag(tank.parent, flag)
         
     return False
 
@@ -109,6 +114,8 @@ def collision_bullet_barrier(arb, space, data):
 
 handler = space.add_collision_handler(1, 0)
 handler.pre_solve = collision_bullet_barrier
+
+
 
 #set barriers
 static_body = space.static_body
@@ -157,6 +164,7 @@ for i in range(0, len(current_map.start_positions)):
     # Add the tank to the list of tanks
 
     tanks_list.append(tank)
+    starttime.append(0)
     game_objects_list.append(base)
     game_objects_list.append(tank)
 
@@ -170,6 +178,11 @@ game_objects_list.append(flag)
 running = True
 
 skip_update = 0
+
+#add reload status for every tank to a list
+for i in range(len(tanks_list)):
+    status = False
+    reloadstatus.append(status)
 
 while running:
     #-- Handle the events
@@ -206,13 +219,18 @@ while running:
                 tanks_list[1].stop_turning()
         if event.type == KEYDOWN:
             if event.key == K_RSHIFT:
-                bullet = tanks_list[0].shoot(space)
-                game_objects_list.append(bullet)
-                bullet_list.append(bullet)
-            if event.key == K_RCTRL:
-                bullet = tanks_list[1].shoot(space)
-                game_objects_list.append(bullet)
-                bullet_list.append(bullet)
+                if tanks_list[0].shoot_tick >= 60:
+                    bullet = tanks_list[0].shoot(space)
+                    game_objects_list.append(bullet)
+                    bullet_list.append(bullet)
+            
+                    
+
+            if event.key == K_LSHIFT:
+                if tanks_list[1].shoot_tick >= 60:
+                    bullet = tanks_list[1].shoot(space)
+                    game_objects_list.append(bullet)
+                    bullet_list.append(bullet)
             if event.key == K_c:
                 pass
             if event.key == K_x:
@@ -223,7 +241,21 @@ while running:
     if tanks_list[0].has_won():
         running = False
 
+    #reload shoot
+    for i in range(0, len(tanks_list)):
+        if tanks_list[i].shooting:
+            if not reloadstatus[i]:
+                starttime[i] = pygame.time.get_ticks()  # Starttime for reload
+                tanks_list[i].shoot(space)
+                reloadstatus[i] = True
+            else:
+                tanks_list[i].shooting = False
+                # After 1500 gameticks reload is over
+            if reloadstatus[i] and pygame.time.get_ticks() - starttime[i] >= 1500:
+                reloadstatus[i] = False
+                tanks_list[i].shooting = False
 
+    
 
 
 

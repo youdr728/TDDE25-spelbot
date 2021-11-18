@@ -22,6 +22,7 @@ class GameObject:
 
 
     def update(self):
+
         """ Placeholder, supposed to be implemented in a subclass.
             Should update the current state (after a tick) of the object."""
         return
@@ -135,7 +136,7 @@ class Tank(GamePhysicsObject):
     ACCELERATION = 0.4
     NORMAL_MAX_SPEED = 2.0
     FLAG_MAX_SPEED = NORMAL_MAX_SPEED * 0.5
-
+    shoot_tick = 60
     def __init__(self, x, y, orientation, sprite, space):
         super().__init__(x, y, orientation, sprite, space, True)
         # Define variable used to apply motion to the tanks
@@ -143,13 +144,16 @@ class Tank(GamePhysicsObject):
         self.rotation = 0 # 1 clockwise, 0 for no rotation, -1 counter clockwise
         self.shape.parent = self    
         self.shape.collision_type = 2
-        
+        self.shooting = False
 
 
 
         self.flag                 = None                      # This variable is used to access the flag object, if the current tank is carrying the flag
         self.max_speed        = Tank.NORMAL_MAX_SPEED     # Impose a maximum speed to the tank
         self.start_position       = pymunk.Vec2d(x, y)        # Define the start position, which is also the position where the tank has to return with the flag
+
+        self.time_since_last_shot = pygame.time.get_ticks()
+        
 
 
     def accelerate(self):
@@ -197,6 +201,7 @@ class Tank(GamePhysicsObject):
 
 
     def post_update(self):
+        self.shoot_tick = self.shoot_tick + 1
         # If the tank carries the flag, then update the positon of the flag
         if(self.flag != None):
             self.flag.x           = self.body.position[0]
@@ -220,6 +225,9 @@ class Tank(GamePhysicsObject):
                 self.flag           = flag
                 flag.is_on_tank     = True
                 self.max_speed  = Tank.FLAG_MAX_SPEED
+    def drop_flag(self, flag):
+        self.flag = None
+        flag.is_on_tank = False
 
     def has_won(self):
         """ Check if the current tank has won (if it is has the flag and it is close to its start position). """
@@ -228,7 +236,9 @@ class Tank(GamePhysicsObject):
     def shoot(self, space):
         """ Call this function to shoot a missile (current implementation does nothing ! you need to implement it yourself) """
         print(self.body.position[0])
-        return Bullet(self.body.position[0], self.body.position[1], math.degrees(self.body.angle), images.bullet, space)
+        self.shooting = True
+        self.shoot_tick = 0
+        return Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle), self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space)
 
 
 class Box(GamePhysicsObject):
