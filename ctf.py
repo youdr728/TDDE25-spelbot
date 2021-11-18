@@ -36,7 +36,6 @@ tanks_list          = []
 bullet_list         = []
 box_list            = []
 starttime           = []
-reloadstatus        = []
 
 #-- Resize the screen to the size of the current level
 screen = pygame.display.set_mode(current_map.rect().size)
@@ -139,165 +138,151 @@ for x in range(0, current_map.width):
 
 
 #-- Create the boxes
-for x in range(0, current_map.width):
-    for y in range(0,  current_map.height):
-        # Get the type of boxes
-        box_type  = current_map.boxAt(x, y)
-        # If the box type is not 0 (aka grass tile), create a box
-        if(box_type != 0):
-            # Create a "Box" using the box_type, aswell as the x,y coordinates,
-            # and the pymunk space
-            box = gameobjects.get_box_with_type(x, y, box_type, space)
-            game_objects_list.append(box)
-            box_list.append(box)
+def create_boxes():
+    for x in range(0, current_map.width):
+        for y in range(0,  current_map.height):
+            # Get the type of boxes
+            box_type  = current_map.boxAt(x, y)
+            # If the box type is not 0 (aka grass tile), create a box
+            if(box_type != 0):
+                # Create a "Box" using the box_type, aswell as the x,y coordinates,
+                # and the pymunk space
+                box = gameobjects.get_box_with_type(x, y, box_type, space)
+                game_objects_list.append(box)
+                box_list.append(box)
 
 
 #-- Create the tanks/bases
 # Loop over the starting poistion
-for i in range(0, len(current_map.start_positions)):
-    # Get the starting position of the tank "i"
-    pos = current_map.start_positions[i]
-    #create bases
-    base = gameobjects.GameVisibleObject(pos[0], pos[1], images.bases[i])
-    # Create the tank, images.tanks contains the image representing the tank
-    tank = gameobjects.Tank(pos[0], pos[1], pos[2], images.tanks[i], space)
-    # Add the tank to the list of tanks
+def create_tanks_and_bases():
+    for i in range(0, len(current_map.start_positions)):
+        # Get the starting position of the tank "i"
+        pos = current_map.start_positions[i]
+        #create bases
+        base = gameobjects.GameVisibleObject(pos[0], pos[1], images.bases[i])
+        # Create the tank, images.tanks contains the image representing the tank
+        tank = gameobjects.Tank(pos[0], pos[1], pos[2], images.tanks[i], space)
+        # Add the tank to the list of tanks
 
-    tanks_list.append(tank)
-    starttime.append(0)
-    game_objects_list.append(base)
-    game_objects_list.append(tank)
+        tanks_list.append(tank)
+        starttime.append(0)
+        game_objects_list.append(base)
+        game_objects_list.append(tank)
 
 #-- Create the flag
+
 flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
 game_objects_list.append(flag)
 
-#----- Main Loop -----#
 
-#-- Control whether the game run
-running = True
+# main loop
+def main_loop():
+    #-- Control whether the game run
+    running = True
+    skip_update = 0
+    while running:
+        #-- Handle the events
+        for event in pygame.event.get():
+            # Check if we receive a QUIT event (for instance, if the user press the
+            # close button of the wiendow) or if the user press the escape key.
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                running = False
+            if event.type == KEYDOWN:
+                if event.key == K_w:
+                    tanks_list[1].accelerate()
+                if event.key == K_s:
+                    tanks_list[1].decelerate()
+                if event.key == K_d:
+                    tanks_list[1].turn_right()
+                if event.key == K_a:
+                    tanks_list[1].turn_left()
+                if event.key == K_UP:
+                    tanks_list[0].accelerate()
+                if event.key == K_DOWN:
+                    tanks_list[0].decelerate()
+                if event.key == K_RIGHT:
+                    tanks_list[0].turn_right()
+                if event.key == K_LEFT:
+                    tanks_list[0].turn_left()
+            if event.type == KEYUP:
+                if (event.key == K_DOWN or event.key == K_UP):
+                    tanks_list[0].stop_moving()
+                if (event.key == K_RIGHT or event.key == K_LEFT):
+                    tanks_list[0].stop_turning()
+                if (event.key == K_w or event.key == K_s):
+                    tanks_list[1].stop_moving()
+                if (event.key == K_d or event.key == K_a):
+                    tanks_list[1].stop_turning()
+            if event.type == KEYDOWN:
+                if event.key == K_RSHIFT:
+                    if tanks_list[0].shoot_tick >= 60:
+                        bullet = tanks_list[0].shoot(space)
+                        game_objects_list.append(bullet)
+                        bullet_list.append(bullet)
+                
+                        
 
-skip_update = 0
+                if event.key == K_LSHIFT:
+                    if tanks_list[1].shoot_tick >= 60:
+                        bullet = tanks_list[1].shoot(space)
+                        game_objects_list.append(bullet)
+                        bullet_list.append(bullet)
+                if event.key == K_c:
+                    pass
+                if event.key == K_x:
+                    pass    
 
-#add reload status for every tank to a list
-for i in range(len(tanks_list)):
-    status = False
-    reloadstatus.append(status)
-
-while running:
-    #-- Handle the events
-    for event in pygame.event.get():
-        # Check if we receive a QUIT event (for instance, if the user press the
-        # close button of the wiendow) or if the user press the escape key.
-        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+        tanks_list[0].try_grab_flag(flag)
+        tanks_list[1].try_grab_flag(flag)
+        if tanks_list[0].has_won():
             running = False
-        if event.type == KEYDOWN:
-            if event.key == K_w:
-                tanks_list[1].accelerate()
-            if event.key == K_s:
-                tanks_list[1].decelerate()
-            if event.key == K_d:
-                tanks_list[1].turn_right()
-            if event.key == K_a:
-                tanks_list[1].turn_left()
-            if event.key == K_UP:
-                tanks_list[0].accelerate()
-            if event.key == K_DOWN:
-                tanks_list[0].decelerate()
-            if event.key == K_RIGHT:
-                tanks_list[0].turn_right()
-            if event.key == K_LEFT:
-                tanks_list[0].turn_left()
-        if event.type == KEYUP:
-            if (event.key == K_DOWN or event.key == K_UP):
-                tanks_list[0].stop_moving()
-            if (event.key == K_RIGHT or event.key == K_LEFT):
-                tanks_list[0].stop_turning()
-            if (event.key == K_w or event.key == K_s):
-                tanks_list[1].stop_moving()
-            if (event.key == K_d or event.key == K_a):
-                tanks_list[1].stop_turning()
-        if event.type == KEYDOWN:
-            if event.key == K_RSHIFT:
-                if tanks_list[0].shoot_tick >= 60:
-                    bullet = tanks_list[0].shoot(space)
-                    game_objects_list.append(bullet)
-                    bullet_list.append(bullet)
-            
-                    
-
-            if event.key == K_LSHIFT:
-                if tanks_list[1].shoot_tick >= 60:
-                    bullet = tanks_list[1].shoot(space)
-                    game_objects_list.append(bullet)
-                    bullet_list.append(bullet)
-            if event.key == K_c:
-                pass
-            if event.key == K_x:
-                pass    
-
-    tanks_list[0].try_grab_flag(flag)
-    tanks_list[1].try_grab_flag(flag)
-    if tanks_list[0].has_won():
-        running = False
-
-    #reload shoot
-    for i in range(0, len(tanks_list)):
-        if tanks_list[i].shooting:
-            if not reloadstatus[i]:
-                starttime[i] = pygame.time.get_ticks()  # Starttime for reload
-                tanks_list[i].shoot(space)
-                reloadstatus[i] = True
-            else:
-                tanks_list[i].shooting = False
-                # After 1500 gameticks reload is over
-            if reloadstatus[i] and pygame.time.get_ticks() - starttime[i] >= 1500:
-                reloadstatus[i] = False
-                tanks_list[i].shooting = False
-
-    
 
 
+        #-- Update physics
+        if skip_update == 0:
+            # Loop over all the game objects and update their speed in function of their
+            # acceleration.
+            for obj in game_objects_list:
+                obj.update()
+            skip_update = 2
+        else:
+            skip_update -= 1
 
+        #   Check collisions and update the objects position
+        handler = space.add_collision_handler(1, 2)
 
+        space.step(1 / FRAMERATE)
 
-
-    #-- Update physics
-    if skip_update == 0:
-        # Loop over all the game objects and update their speed in function of their
-        # acceleration.
+        #   Update object that depends on an other object position (for instance a flag)
         for obj in game_objects_list:
-            obj.update()
-        skip_update = 2
-    else:
-        skip_update -= 1
-
-    #   Check collisions and update the objects position
-    handler = space.add_collision_handler(1, 2)
-
-    space.step(1 / FRAMERATE)
-
-    #   Update object that depends on an other object position (for instance a flag)
-    for obj in game_objects_list:
-        obj.post_update()
+            obj.post_update()
 
 
-    #-- Update Display
+        #-- Update Display
 
-    # Display the background on the screen
-    screen.blit(background, (0, 0))
+        # Display the background on the screen
+        screen.blit(background, (0, 0))
 
 
-    for obj in game_objects_list:
-        obj.update_screen(screen)
+        for obj in game_objects_list:
+            obj.update_screen(screen)
 
 
 
-    # Update the display of the game objects on the screen
+        # Update the display of the game objects on the screen
 
 
-    #   Redisplay the entire screen (see double buffer technique)
-    pygame.display.flip()
+        #   Redisplay the entire screen (see double buffer technique)
+        pygame.display.flip()
 
-    #   Control the game framerate
-    clock.tick(FRAMERATE)
+        #   Control the game framerate
+        clock.tick(FRAMERATE)
+
+
+create_boxes()
+create_tanks_and_bases()
+main_loop()
+
+
+
+
