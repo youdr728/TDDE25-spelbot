@@ -33,6 +33,7 @@ current_map         = maps.map0
 #   List of all game objects
 game_objects_list   = []
 tanks_list          = []
+ai_list             = []
 bullet_list         = []
 box_list            = []
 starttime           = []
@@ -163,7 +164,8 @@ def create_tanks_and_bases():
         # Create the tank, images.tanks contains the image representing the tank
         tank = gameobjects.Tank(pos[0], pos[1], pos[2], images.tanks[i], space)
         # Add the tank to the list of tanks
-
+        AI = ai.Ai(tank, game_objects_list, tanks_list, space, current_map)
+        ai_list.append(AI)
         tanks_list.append(tank)
         starttime.append(0)
         game_objects_list.append(base)
@@ -239,6 +241,10 @@ def main_loop():
             if tanks_list[i].has_won():
                 running = False
 
+        for ai in ai_list:
+            ai.decide()
+
+        tile_neighbors = ai_list[0].get_tile_neighbors(tanks_list[0].body.position)
 
         #-- Update physics
         if skip_update == 0:

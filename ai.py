@@ -14,16 +14,16 @@ def angle_between_vectors(vec1, vec2):
     """ Since Vec2d operates in a cartesian coordinate space we have to
         convert the resulting vector to get the correct angle for our space.
     """
-    vec = vec1 - vec2 
+    vec = vec1 - vec2
     vec = vec.perpendicular()
     return vec.angle
 
-def periodic_difference_of_angles(angle1, angle2): 
+def periodic_difference_of_angles(angle1, angle2):
     return  (angle1% (2*math.pi)) - (angle2% (2*math.pi))
 
 
 class Ai:
-    """ A simple ai that finds the shortest path to the target using 
+    """ A simple ai that finds the shortest path to the target using
     a breadth first search. Also capable of shooting other tanks and or wooden
     boxes. """
 
@@ -34,7 +34,7 @@ class Ai:
         self.space              = space
         self.currentmap         = currentmap
         self.flag = None
-        self.MAX_X = currentmap.width - 1 
+        self.MAX_X = currentmap.width - 1
         self.MAX_Y = currentmap.height - 1
 
         self.path = deque()
@@ -51,17 +51,17 @@ class Ai:
 
     def maybe_shoot(self):
         """ Makes a raycast query in front of the tank. If another tank
-            or a wooden box is found, then we shoot. 
+            or a wooden box is found, then we shoot.
         """
         pass # To be implemented
 
     def move_cycle_gen (self):
         """ A generator that iteratively goes through all the required steps
             to move to our goal.
-        """ 
+        """
         while True:
             yield
-        
+
     def find_shortest_path(self):
         """ A simple Breadth First Search using integer coordinates as our nodes.
             Edges are calculated as we go, using an external function.
@@ -69,7 +69,7 @@ class Ai:
         # To be implemented
         shortest_path = []
         return deque(shortest_path)
-            
+
     def get_target_tile(self):
         """ Returns position of the flag if we don't have it. If we do have the flag,
             return the position of our home base.
@@ -103,10 +103,22 @@ class Ai:
             A bordering square is only considered accessible if it is grass
             or a wooden box.
         """
+        x_coorddinate=math.floor(coord_vec[0])
+        y_coordinate=math.floor(coord_vec[1])
+
+
         neighbors = [] # Find the coordinates of the tiles' four neighbors
+        neighbors.append((tuple((x_coorddinate+1,y_coordinate))))
+        neighbors.append((tuple((x_coorddinate-1,y_coordinate))))
+        neighbors.append((tuple((x_coorddinate,y_coordinate+1))))
+        neighbors.append((tuple((x_coorddinate,y_coordinate-1))))
+
         return filter(self.filter_tile_neighbors, neighbors)
 
     def filter_tile_neighbors (self, coord):
-        return True
+        if self.currentmap.boxAt(coord[0], coord[1]) and 0 <= coord[0] <= self.MAX_X and 0 <= coord[1] <= self.MAX_Y:
+            return True
+        return False
+
 
 SimpleAi = Ai # Legacy
