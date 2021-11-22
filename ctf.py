@@ -43,7 +43,7 @@ screen = pygame.display.set_mode(current_map.rect().size)
 def collision_bullet_box(arb, space, data):
     box = arb.shapes[0]
     bullet = arb.shapes[1]
-    
+
     if box.parent.destructable:
         if bullet.parent in game_objects_list:
             bullet_list.remove(bullet.parent)
@@ -57,7 +57,7 @@ def collision_bullet_box(arb, space, data):
             bullet_list.remove(bullet.parent)
             game_objects_list.remove(bullet.parent)
             space.remove(bullet, bullet.body)
-        
+
     return False
 
 handler = space.add_collision_handler(3, 1)
@@ -66,7 +66,7 @@ handler.pre_solve = collision_bullet_box
 def collision_bullet_tank(arb, space, data):
     tank = arb.shapes[0]
     bullet = arb.shapes[1]
-    
+
     if bullet.parent in game_objects_list:
         bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
@@ -74,7 +74,7 @@ def collision_bullet_tank(arb, space, data):
         tank.body.position=tank.parent.start_position
     if tank.parent.flag == flag:
         gameobjects.Tank.drop_flag(tank.parent, flag)
-        
+
     return False
 
 handler = space.add_collision_handler(2, 1)
@@ -86,7 +86,7 @@ def collision_bullet_bullet(arb, space, data):
         bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
     space.remove(bullet, bullet.body)
-    
+
 
 
     """if bullet.parent in game_objects_list:
@@ -96,7 +96,7 @@ def collision_bullet_bullet(arb, space, data):
         bullet_list.remove(bullet2.parent)
         game_objects_list.remove(bullet2.parent)
         space.remove(bullet, bullet2.body)"""
-        
+
     return False
 
 handler = space.add_collision_handler(1, 0)
@@ -108,7 +108,7 @@ def collision_bullet_barrier(arb, space, data):
         bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
     space.remove(bullet, bullet.body)
-        
+
     return False
 
 handler = space.add_collision_handler(1, 0)
@@ -219,8 +219,8 @@ def main_loop():
                         bullet = tanks_list[0].shoot(space)
                         game_objects_list.append(bullet)
                         bullet_list.append(bullet)
-                
-                        
+
+
 
                 if event.key == K_LSHIFT:
                     if tanks_list[1].shoot_tick >= 60:
@@ -230,12 +230,14 @@ def main_loop():
                 if event.key == K_c:
                     pass
                 if event.key == K_x:
-                    pass    
+                    pass
 
         tanks_list[0].try_grab_flag(flag)
         tanks_list[1].try_grab_flag(flag)
-        if tanks_list[0].has_won():
-            running = False
+
+        for i in range(len(tanks_list)):
+            if tanks_list[i].has_won():
+                running = False
 
 
         #-- Update physics
@@ -282,7 +284,3 @@ def main_loop():
 create_boxes()
 create_tanks_and_bases()
 main_loop()
-
-
-
-
