@@ -295,7 +295,6 @@ class Bullet(GamePhysicsObject):
         self.VELOCITY = 5
         self.shape.parent = self
         self.shape.collision_type = 1
-        
 
     def update(self):
         """ A function to update the objects coordinates. Gets called at every tick of the game. """
@@ -308,10 +307,12 @@ class Bullet(GamePhysicsObject):
         # Makes sure that we dont exceed our speed limit
         velocity = self.VELOCITY
         self.body.velocity = pymunk.Vec2d(velocity, 0).rotated(self.body.velocity.angle)
-
+        ''' set angle in init, remove the velocity vector'''
         # Updates the rotation
         self.body.angular_velocity = 0
 
 
     def bullet_collided():
         pass
+
+    
