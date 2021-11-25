@@ -91,25 +91,23 @@ class Ai:
 """
         shortest_path = []
         start = self.grid_pos
-        bfs_queue = deque()
-        bfs_queue.append([start])
+        queue = deque()
+        queue.append([start])
         visited_nodes = set()
 
-        while bfs_queue:
-            path = bfs_queue.popleft()
+        while queue:
+            path = queue.popleft()
             node = path[-1]
-
             if node == self.get_target_tile():
                 path.popleft()
                 print(path)
                 return path
-
-            for neighbour in self.get_tile_neighbors(node):
-                if neighbour.int_tuple not in visited_nodes:
+            for neighbor in self.get_tile_neighbors(node):
+                if neighbor.int_tuple not in visited_nodes:
                     new_path = deque(path)
-                    new_path.append(neighbour)
-                    bfs_queue.append(new_path)
-                    visited_nodes.add(neighbour.int_tuple)
+                    new_path.append(neighbor)
+                    queue.append(new_path)
+                    visited_nodes.add(neighbor.int_tuple)
 
     def get_target_tile(self):
         """ Returns position of the flag if we don't have it. If we do have the flag,
