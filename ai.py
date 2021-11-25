@@ -67,7 +67,48 @@ class Ai:
             Edges are calculated as we go, using an external function.
         """
         # To be implemented
+        """
         shortest_path = []
+        start_node = self.grid_pos
+        queue = deque()
+        queue.append(start_node)
+        visited_nodes = set(start.int_tuple)
+        node_tree
+
+        while queue:
+            queue.popleft()
+            if get_tile_of_position(tanks_list[0].body.position) == get_target_tile:
+                queue.append(get_tile_of_position(tanks_list[0].body.position))
+                break
+            for neighbor in self.get_tile_neighbors(node)
+
+                if neighbor
+
+
+        return deque(shortest_path)
+"""
+        shortest_path = []
+        start = self.grid_pos
+        bfs_queue = deque()
+        bfs_queue.append(start)
+        visited_nodes = set(start.int_tuple)
+        node_tree = {}
+
+        while len(bfs_queue) > 0:
+            node = bfs_queue.popleft()
+            if node == self.get_target_tile():
+                while node != start:
+                    shortest_path.append(node)
+                    parent = node_tree[node.int_tuple]
+                    node = parent
+                shortest_path.reverse()
+                break
+            for neighbour in self.get_tile_neighbors(node):
+                if neighbour.int_tuple not in visited_nodes:
+                    bfs_queue.append(neighbour)
+                    node_tree[neighbour.int_tuple] = node
+                    visited_nodes.add(neighbour.int_tuple)
+
         return deque(shortest_path)
 
     def get_target_tile(self):
@@ -112,11 +153,10 @@ class Ai:
         neighbors.append((tuple((x_coorddinate-1,y_coordinate))))
         neighbors.append((tuple((x_coorddinate,y_coordinate+1))))
         neighbors.append((tuple((x_coorddinate,y_coordinate-1))))
-
         return filter(self.filter_tile_neighbors, neighbors)
 
     def filter_tile_neighbors (self, coord):
-        if self.currentmap.boxAt(coord[0], coord[1]) and 0 <= coord[0] <= self.MAX_X and 0 <= coord[1] <= self.MAX_Y:
+        if self.currentmap.boxAt(coord[0], coord[1])==0 and 0 <= coord[0] <= self.MAX_X and 0 <= coord[1] <= self.MAX_Y:
             return True
         return False
 
