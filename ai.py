@@ -98,6 +98,7 @@ class Ai:
         while bfs_queue:
             path = bfs_queue.popleft()
             node = path[-1]
+
             if node == self.get_target_tile():
                 path.popleft()
                 print(path)
@@ -109,8 +110,6 @@ class Ai:
                     new_path.append(neighbour)
                     bfs_queue.append(new_path)
                     visited_nodes.add(neighbour.int_tuple)
-
-        return deque(shortest_path)
 
     def get_target_tile(self):
         """ Returns position of the flag if we don't have it. If we do have the flag,
