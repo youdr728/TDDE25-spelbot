@@ -47,7 +47,9 @@ class Ai:
 
     def decide(self):
         """ Main decision function that gets called on every tick of the game. """
-        pass # To be implemented
+        next(self.move_cycle)
+        self.find_shortest_path()
+
 
     def maybe_shoot(self):
         """ Makes a raycast query in front of the tank. If another tank
@@ -90,23 +92,22 @@ class Ai:
         shortest_path = []
         start = self.grid_pos
         bfs_queue = deque()
-        bfs_queue.append(start)
-        visited_nodes = set(start.int_tuple)
-        node_tree = {}
+        bfs_queue.append([start])
+        visited_nodes = set()
 
-        while len(bfs_queue) > 0:
-            node = bfs_queue.popleft()
+        while bfs_queue:
+            path = bfs_queue.popleft()
+            node = path[-1]
             if node == self.get_target_tile():
-                while node != start:
-                    shortest_path.append(node)
-                    parent = node_tree[node.int_tuple]
-                    node = parent
-                shortest_path.reverse()
-                break
+                path.popleft()
+                print(path)
+                return path
+
             for neighbour in self.get_tile_neighbors(node):
                 if neighbour.int_tuple not in visited_nodes:
-                    bfs_queue.append(neighbour)
-                    node_tree[neighbour.int_tuple] = node
+                    new_path = deque(path)
+                    new_path.append(neighbour)
+                    bfs_queue.append(new_path)
                     visited_nodes.add(neighbour.int_tuple)
 
         return deque(shortest_path)
@@ -144,20 +145,21 @@ class Ai:
             A bordering square is only considered accessible if it is grass
             or a wooden box.
         """
-        x_coorddinate=math.floor(coord_vec[0])
-        y_coordinate=math.floor(coord_vec[1])
 
 
         neighbors = [] # Find the coordinates of the tiles' four neighbors
-        neighbors.append((tuple((x_coorddinate+1,y_coordinate))))
-        neighbors.append((tuple((x_coorddinate-1,y_coordinate))))
-        neighbors.append((tuple((x_coorddinate,y_coordinate+1))))
-        neighbors.append((tuple((x_coorddinate,y_coordinate-1))))
+        neighbors.append(coord_vec+Vec2d(0,1))
+        neighbors.append(coord_vec+Vec2d(0,-1))
+        neighbors.append(coord_vec+Vec2d(1,0))
+        neighbors.append(coord_vec+Vec2d(-1,0))
+
         return filter(self.filter_tile_neighbors, neighbors)
 
     def filter_tile_neighbors (self, coord):
-        if self.currentmap.boxAt(coord[0], coord[1])==0 and 0 <= coord[0] <= self.MAX_X and 0 <= coord[1] <= self.MAX_Y:
-            return True
+        if coord[0] <= self.MAX_X and coord[0] >= 0:
+            if coord[1] <= self.MAX_Y and coord[1] >= 0:
+                if self.currentmap.boxAt(coord[0], coord[1]) == 0:
+                    return True
         return False
 
 
