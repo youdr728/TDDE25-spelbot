@@ -68,27 +68,6 @@ class Ai:
         """ A simple Breadth First Search using integer coordinates as our nodes.
             Edges are calculated as we go, using an external function.
         """
-        # To be implemented
-        """
-        shortest_path = []
-        start_node = self.grid_pos
-        queue = deque()
-        queue.append(start_node)
-        visited_nodes = set(start.int_tuple)
-        node_tree
-
-        while queue:
-            queue.popleft()
-            if get_tile_of_position(tanks_list[0].body.position) == get_target_tile:
-                queue.append(get_tile_of_position(tanks_list[0].body.position))
-                break
-            for neighbor in self.get_tile_neighbors(node)
-
-                if neighbor
-
-
-        return deque(shortest_path)
-"""
         shortest_path = []
         start = self.grid_pos
         queue = deque()
