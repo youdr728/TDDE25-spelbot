@@ -62,6 +62,36 @@ class Ai:
             to move to our goal.
         """
         while True:
+            self.update_grid_pos()
+            path = self.find_shortest_path()
+            if not path:
+                yield
+                continue
+            next_coord = path.popleft()
+            target_angle = angle_between_vectors(self.tank.body.position, next_coord + (0.5, 0.5))
+            periodic_angle = periodic_difference_of_angles(self.tank.body.angle, target_angle)
+
+            if 0<periodic_angle < math.pi:
+                self.tank.turn_left()
+                yield
+            elif -2*math.pi < periodic_angle < -math.pi:
+                self.tank.turn_left()
+                yield
+            else:
+                self.tank.turn_right()
+                yield
+
+            while abs(periodic_angle) > MIN_ANGLE_DIF:
+                periodic_angle = periodic_difference_of_angles(self.tank.body.angle, target_angle)
+                yield
+            self.tank.stop_turning()
+            self.tank.accelerate()
+
+            distance = self.tank.body.position.get_distance(next_coord+(0.5, 0.5))
+            while distance > 0.1:
+                distance = self.tank.body.position.get_distance(next_coord+(0.5, 0.5))
+                yield
+            self.tank.stop_moving()
             yield
 
     def find_shortest_path(self):
@@ -79,7 +109,6 @@ class Ai:
             node = path[-1]
             if node == self.get_target_tile():
                 path.popleft()
-                print(path)
                 return path
             for neighbor in self.get_tile_neighbors(node):
                 if neighbor.int_tuple not in visited_nodes:
