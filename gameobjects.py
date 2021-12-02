@@ -142,7 +142,7 @@ class Tank(GamePhysicsObject):
         # Define variable used to apply motion to the tanks
         self.acceleration = 0 # 1 forward, 0 for stand still, -1 for backwards
         self.rotation = 0 # 1 clockwise, 0 for no rotation, -1 counter clockwise
-        self.shape.parent = self    
+        self.shape.parent = self
         self.shape.collision_type = 2
         self.shooting = False
 
@@ -153,7 +153,7 @@ class Tank(GamePhysicsObject):
         self.start_position       = pymunk.Vec2d(x, y)        # Define the start position, which is also the position where the tank has to return with the flag
 
         self.time_since_last_shot = pygame.time.get_ticks()
-        
+
 
 
     def accelerate(self):
@@ -235,7 +235,6 @@ class Tank(GamePhysicsObject):
 
     def shoot(self, space):
         """ Call this function to shoot a missile (current implementation does nothing ! you need to implement it yourself) """
-        print(self.body.position[0])
         self.shooting = True
         self.shoot_tick = 0
         return Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle), self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space)
@@ -314,5 +313,3 @@ class Bullet(GamePhysicsObject):
 
     def bullet_collided():
         pass
-
-    

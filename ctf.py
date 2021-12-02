@@ -67,14 +67,15 @@ handler.pre_solve = collision_bullet_box
 def collision_bullet_tank(arb, space, data):
     tank = arb.shapes[0]
     bullet = arb.shapes[1]
+    tank.body.position = tank.parent.start_position
 
     if bullet.parent in game_objects_list:
         bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
         space.remove(bullet, bullet.body)
-        tank.body.position=tank.parent.start_position
     if tank.parent.flag == flag:
         gameobjects.Tank.drop_flag(tank.parent, flag)
+
 
     return False
 

@@ -36,7 +36,6 @@ class Ai:
         self.flag = None
         self.MAX_X = currentmap.width - 1
         self.MAX_Y = currentmap.height - 1
-
         self.path = deque()
         self.move_cycle = self.move_cycle_gen()
         self.update_grid_pos()
@@ -47,20 +46,37 @@ class Ai:
 
     def decide(self):
         """ Main decision function that gets called on every tick of the game. """
+        self.maybe_shoot()
         next(self.move_cycle)
-        self.find_shortest_path()
 
 
     def maybe_shoot(self):
         """ Makes a raycast query in front of the tank. If another tank
             or a wooden box is found, then we shoot.
         """
-        pass # To be implemented
+        angle = self.tank.body.angle + math.pi/2
+
+        start = Vec2d(0.5*math.cos(angle), 0.5*math.sin(angle))
+        end = Vec2d(self.MAX_X*math.cos(angle), (self.MAX_Y*math.sin))
+        print(start, end)
+        box_or_tank = self.space.segment_query_first(start, end, 0, pymunk.ShapeFilter())
+
+        if hasattr(box_or_tank, "shape"):
+            if hasattr(box_or_tank.shape, "parent"):
+                if isinstance(box_or_tank.shape.parent, gameobjects.Box):
+                    if box_or_tank.shape.parent.destructable:
+                        self.tank.shoot(self.space)
+                        print("box")
+                elif isinstance(box_or_tank.shape.parent, gameobjects.Tank):
+                    print("tank")
+                    self.tank.shoot(self.space)
 
     def move_cycle_gen (self):
-        """ A generator that iteratively goes through all the required steps
-            to move to our goal.
         """
+        A generator that iteratively goes through all the required steps
+        to move to our goal.
+        """
+        self.find_shortest_path()
         while True:
             self.update_grid_pos()
             path = self.find_shortest_path()
@@ -150,7 +166,6 @@ class Ai:
             A bordering square is only considered accessible if it is grass
             or a wooden box.
         """
-
 
         neighbors = [] # Find the coordinates of the tiles' four neighbors
         neighbors.append(coord_vec+Vec2d(0,1))
