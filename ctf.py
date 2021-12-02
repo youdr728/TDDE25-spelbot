@@ -29,7 +29,7 @@ FRAMERATE = 60
 
 #-- Variables
 #   Define the current level
-current_map         = maps.map0
+current_map         = maps.map1
 #   List of all game objects
 game_objects_list   = []
 tanks_list          = []
@@ -108,7 +108,7 @@ handler.pre_solve = collision_bullet_bullet
 def collision_bullet_barrier(arb, space, data):
     bullet = arb.shapes[0]
     if bullet.parent in game_objects_list:
-        bullet_list.remove(bullet.parent)
+        #bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
     space.remove(bullet, bullet.body)
 

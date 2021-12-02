@@ -40,6 +40,7 @@ class Ai:
         self.move_cycle = self.move_cycle_gen()
         self.update_grid_pos()
 
+        self.walk_metal = False
     def update_grid_pos(self):
         """ This should only be called in the beginning, or at the end of a move_cycle. """
         self.grid_pos = self.get_tile_of_position(self.tank.body.position)
@@ -87,6 +88,7 @@ class Ai:
             self.update_grid_pos()
             path = self.find_shortest_path()
             if not path:
+                self.walk_metal = True
                 yield
                 continue
             next_coord = path.popleft()
@@ -185,9 +187,12 @@ class Ai:
         return filter(self.filter_tile_neighbors, neighbors)
 
     def filter_tile_neighbors (self, coord):
+        walkable = [0,2]
+        if self.walk_metal:
+            walkable.append(3)
         if coord[0] <= self.MAX_X and coord[0] >= 0:
             if coord[1] <= self.MAX_Y and coord[1] >= 0:
-                if self.currentmap.boxAt(coord[0], coord[1]) in [0,2]:
+                if self.currentmap.boxAt(coord[0], coord[1]) in walkable:
                     return True
         return False
 
