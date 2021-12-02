@@ -46,7 +46,10 @@ class Ai:
 
     def decide(self):
         """ Main decision function that gets called on every tick of the game. """
-        self.maybe_shoot()
+        if self.maybe_shoot() and self.tank.shoot_tick >= 60:
+            bullet = self.tank.shoot(self.space,self.tank)
+            self.game_objects_list.append(bullet)
+
         next(self.move_cycle)
 
 
@@ -54,22 +57,25 @@ class Ai:
         """ Makes a raycast query in front of the tank. If another tank
             or a wooden box is found, then we shoot.
         """
-        angle = self.tank.body.angle + math.pi/2
+        angle = self.tank.body.angle - math.pi/2
 
-        start = Vec2d(0.5*math.cos(angle), 0.5*math.sin(angle))
-        end = Vec2d(self.MAX_X*math.cos(angle), (self.MAX_Y*math.sin))
-        print(start, end)
+        start = Vec2d(self.tank.body.position[0] - 0.5*math.cos(angle), self.tank.body.position[1] - 0.5*math.sin(angle))
+        end = Vec2d(self.tank.body.position[0] - self.MAX_X*math.cos(angle), self.tank.body.position[1] - self.MAX_Y*math.sin(angle))
         box_or_tank = self.space.segment_query_first(start, end, 0, pymunk.ShapeFilter())
 
         if hasattr(box_or_tank, "shape"):
             if hasattr(box_or_tank.shape, "parent"):
                 if isinstance(box_or_tank.shape.parent, gameobjects.Box):
                     if box_or_tank.shape.parent.destructable:
-                        self.tank.shoot(self.space)
-                        print("box")
+                        return True
                 elif isinstance(box_or_tank.shape.parent, gameobjects.Tank):
-                    print("tank")
-                    self.tank.shoot(self.space)
+                    return True
+
+
+        return False
+
+
+
 
     def move_cycle_gen (self):
         """
@@ -104,20 +110,22 @@ class Ai:
             self.tank.accelerate()
 
             distance = self.tank.body.position.get_distance(next_coord+(0.5, 0.5))
-            while distance > 0.1:
+            temp_distance = 50
+            while distance <= temp_distance:
+                temp_distance = distance
                 distance = self.tank.body.position.get_distance(next_coord+(0.5, 0.5))
                 yield
             self.tank.stop_moving()
-            yield
+            continue
 
     def find_shortest_path(self):
         """ A simple Breadth First Search using integer coordinates as our nodes.
             Edges are calculated as we go, using an external function.
         """
         shortest_path = []
-        start = self.grid_pos
-        queue = deque()
-        queue.append([start])
+        start = self.tank.body.position
+        queue = deque([[start]])
+
         visited_nodes = set()
 
         while queue:
@@ -168,17 +176,18 @@ class Ai:
         """
 
         neighbors = [] # Find the coordinates of the tiles' four neighbors
-        neighbors.append(coord_vec+Vec2d(0,1))
-        neighbors.append(coord_vec+Vec2d(0,-1))
-        neighbors.append(coord_vec+Vec2d(1,0))
-        neighbors.append(coord_vec+Vec2d(-1,0))
+        current_vec = self.get_tile_of_position(coord_vec)
+        neighbors.append(current_vec+Vec2d(0,1))
+        neighbors.append(current_vec+Vec2d(0,-1))
+        neighbors.append(current_vec+Vec2d(1,0))
+        neighbors.append(current_vec+Vec2d(-1,0))
 
         return filter(self.filter_tile_neighbors, neighbors)
 
     def filter_tile_neighbors (self, coord):
         if coord[0] <= self.MAX_X and coord[0] >= 0:
             if coord[1] <= self.MAX_Y and coord[1] >= 0:
-                if self.currentmap.boxAt(coord[0], coord[1]) == 0:
+                if self.currentmap.boxAt(coord[0], coord[1]) in [0,2]:
                     return True
         return False
 

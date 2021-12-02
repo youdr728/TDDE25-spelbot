@@ -47,7 +47,7 @@ def collision_bullet_box(arb, space, data):
 
     if box.parent.destructable:
         if bullet.parent in game_objects_list:
-            bullet_list.remove(bullet.parent)
+            #bullet_list.remove(bullet.parent)
             box_list.remove(box.parent)
             game_objects_list.remove(bullet.parent)
             game_objects_list.remove(box.parent)
@@ -55,7 +55,7 @@ def collision_bullet_box(arb, space, data):
             space.remove(box, box.body)
     else:
         if bullet.parent in game_objects_list:
-            bullet_list.remove(bullet.parent)
+            #bullet_list.remove(bullet.parent)
             game_objects_list.remove(bullet.parent)
             space.remove(bullet, bullet.body)
 
@@ -67,10 +67,11 @@ handler.pre_solve = collision_bullet_box
 def collision_bullet_tank(arb, space, data):
     tank = arb.shapes[0]
     bullet = arb.shapes[1]
+    if bullet.parent.tank == tank.parent:
+        return False
     tank.body.position = tank.parent.start_position
-
     if bullet.parent in game_objects_list:
-        bullet_list.remove(bullet.parent)
+        #bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
         space.remove(bullet, bullet.body)
     if tank.parent.flag == flag:
@@ -219,7 +220,7 @@ def main_loop():
             if event.type == KEYDOWN:
                 if event.key == K_RSHIFT:
                     if tanks_list[0].shoot_tick >= 60:
-                        bullet = tanks_list[0].shoot(space)
+                        bullet = tanks_list[0].shoot(space,tanks_list[0])
                         game_objects_list.append(bullet)
                         bullet_list.append(bullet)
 
@@ -239,6 +240,7 @@ def main_loop():
         tanks_list[1].try_grab_flag(flag)
 
         for i in range(len(tanks_list)):
+            tanks_list[i].try_grab_flag(flag)
             if tanks_list[i].has_won():
                 running = False
 
