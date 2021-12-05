@@ -36,42 +36,98 @@ class Ai:
         self.flag = None
         self.MAX_X = currentmap.width - 1
         self.MAX_Y = currentmap.height - 1
-
         self.path = deque()
         self.move_cycle = self.move_cycle_gen()
         self.update_grid_pos()
 
+        self.walk_metal = False
     def update_grid_pos(self):
         """ This should only be called in the beginning, or at the end of a move_cycle. """
         self.grid_pos = self.get_tile_of_position(self.tank.body.position)
 
     def decide(self):
         """ Main decision function that gets called on every tick of the game. """
+        if self.maybe_shoot() and self.tank.shoot_tick >= 60:
+            bullet = self.tank.shoot(self.space,self.tank)
+            self.game_objects_list.append(bullet)
+
         next(self.move_cycle)
-        self.find_shortest_path()
 
 
     def maybe_shoot(self):
         """ Makes a raycast query in front of the tank. If another tank
             or a wooden box is found, then we shoot.
         """
-        pass # To be implemented
+        angle = self.tank.body.angle - math.pi/2
+
+        start = Vec2d(self.tank.body.position[0] - 0.5*math.cos(angle), self.tank.body.position[1] - 0.5*math.sin(angle))
+        end = Vec2d(self.tank.body.position[0] - self.MAX_X*math.cos(angle), self.tank.body.position[1] - self.MAX_Y*math.sin(angle))
+        box_or_tank = self.space.segment_query_first(start, end, 0, pymunk.ShapeFilter())
+
+        if hasattr(box_or_tank, "shape"):
+            if hasattr(box_or_tank.shape, "parent"):
+                if isinstance(box_or_tank.shape.parent, gameobjects.Box):
+                    if box_or_tank.shape.parent.destructable:
+                        return True
+                elif isinstance(box_or_tank.shape.parent, gameobjects.Tank):
+                    return True
+
+
+        return False
+
+
+
 
     def move_cycle_gen (self):
-        """ A generator that iteratively goes through all the required steps
-            to move to our goal.
         """
+        A generator that iteratively goes through all the required steps
+        to move to our goal.
+        """
+        self.find_shortest_path()
         while True:
-            yield
+            self.update_grid_pos()
+            path = self.find_shortest_path()
+            if not path:
+                self.walk_metal = True
+                yield
+                continue
+            next_coord = path.popleft()
+            target_angle = angle_between_vectors(self.tank.body.position, next_coord + (0.5, 0.5))
+            periodic_angle = periodic_difference_of_angles(self.tank.body.angle, target_angle)
+
+            if 0<periodic_angle < math.pi:
+                self.tank.turn_left()
+                yield
+            elif -2*math.pi < periodic_angle < -math.pi:
+                self.tank.turn_left()
+                yield
+            else:
+                self.tank.turn_right()
+                yield
+
+            while abs(periodic_angle) > MIN_ANGLE_DIF:
+                periodic_angle = periodic_difference_of_angles(self.tank.body.angle, target_angle)
+                yield
+            self.tank.stop_turning()
+            self.tank.accelerate()
+
+            distance = self.tank.body.position.get_distance(next_coord+(0.5, 0.5))
+            temp_distance = 50
+            while distance <= temp_distance:
+                temp_distance = distance
+                distance = self.tank.body.position.get_distance(next_coord+(0.5, 0.5))
+                yield
+            self.tank.stop_moving()
+            continue
 
     def find_shortest_path(self):
         """ A simple Breadth First Search using integer coordinates as our nodes.
             Edges are calculated as we go, using an external function.
         """
         shortest_path = []
-        start = self.grid_pos
-        queue = deque()
-        queue.append([start])
+        start = self.tank.body.position
+        queue = deque([[start]])
+
         visited_nodes = set()
 
         while queue:
@@ -79,7 +135,6 @@ class Ai:
             node = path[-1]
             if node == self.get_target_tile():
                 path.popleft()
-                print(path)
                 return path
             for neighbor in self.get_tile_neighbors(node):
                 if neighbor.int_tuple not in visited_nodes:
@@ -123,19 +178,22 @@ class Ai:
             or a wooden box.
         """
 
-
         neighbors = [] # Find the coordinates of the tiles' four neighbors
-        neighbors.append(coord_vec+Vec2d(0,1))
-        neighbors.append(coord_vec+Vec2d(0,-1))
-        neighbors.append(coord_vec+Vec2d(1,0))
-        neighbors.append(coord_vec+Vec2d(-1,0))
+        current_vec = self.get_tile_of_position(coord_vec)
+        neighbors.append(current_vec+Vec2d(0,1))
+        neighbors.append(current_vec+Vec2d(0,-1))
+        neighbors.append(current_vec+Vec2d(1,0))
+        neighbors.append(current_vec+Vec2d(-1,0))
 
         return filter(self.filter_tile_neighbors, neighbors)
 
     def filter_tile_neighbors (self, coord):
+        walkable = [0,2]
+        if self.walk_metal:
+            walkable.append(3)
         if coord[0] <= self.MAX_X and coord[0] >= 0:
             if coord[1] <= self.MAX_Y and coord[1] >= 0:
-                if self.currentmap.boxAt(coord[0], coord[1]) == 0:
+                if self.currentmap.boxAt(coord[0], coord[1]) in walkable:
                     return True
         return False
 

@@ -142,7 +142,7 @@ class Tank(GamePhysicsObject):
         # Define variable used to apply motion to the tanks
         self.acceleration = 0 # 1 forward, 0 for stand still, -1 for backwards
         self.rotation = 0 # 1 clockwise, 0 for no rotation, -1 counter clockwise
-        self.shape.parent = self    
+        self.shape.parent = self
         self.shape.collision_type = 2
         self.shooting = False
 
@@ -153,7 +153,7 @@ class Tank(GamePhysicsObject):
         self.start_position       = pymunk.Vec2d(x, y)        # Define the start position, which is also the position where the tank has to return with the flag
 
         self.time_since_last_shot = pygame.time.get_ticks()
-        
+
 
 
     def accelerate(self):
@@ -233,12 +233,12 @@ class Tank(GamePhysicsObject):
         """ Check if the current tank has won (if it is has the flag and it is close to its start position). """
         return self.flag != None and (self.start_position - self.body.position).length < 0.2
 
-    def shoot(self, space):
+    def shoot(self, space,tank):
         """ Call this function to shoot a missile (current implementation does nothing ! you need to implement it yourself) """
-        print(self.body.position[0])
         self.shooting = True
         self.shoot_tick = 0
-        return Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle), self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space)
+        self.tank = tank
+        return Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle), self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space,tank)
 
 
 class Box(GamePhysicsObject):
@@ -289,13 +289,13 @@ class Flag(GameVisibleObject):
 
 class Bullet(GamePhysicsObject):
 
-    def __init__(self, x, y, orientation, sprite, space):
+    def __init__(self, x, y, orientation, sprite, space,tank):
         super().__init__(x, y, orientation, sprite, space, True)
         self.acceleration = 1 # 1 forward, 0 for stand still, -1 for backwards
         self.VELOCITY = 5
         self.shape.parent = self
         self.shape.collision_type = 1
-
+        self.tank = tank
     def update(self):
         """ A function to update the objects coordinates. Gets called at every tick of the game. """
 
@@ -314,5 +314,3 @@ class Bullet(GamePhysicsObject):
 
     def bullet_collided():
         pass
-
-    
