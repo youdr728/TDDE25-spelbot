@@ -134,7 +134,7 @@ class Tank(GamePhysicsObject):
     # Constant values for the tank, acessed like: Tank.ACCELERATION
     # You can add more constants here if needed later
     ACCELERATION = 0.4
-    NORMAL_MAX_SPEED = 2.0
+    NORMAL_MAX_SPEED = 5.0
     FLAG_MAX_SPEED = NORMAL_MAX_SPEED * 0.5
     shoot_tick = 60
 
@@ -232,6 +232,7 @@ class Tank(GamePhysicsObject):
             if((flag_pos - self.body.position).length < 0.5):
                 pick_flag = pygame.mixer.Sound("data/pick_flag.wav")
                 pygame.mixer.Sound.play(pick_flag)
+
                 # Grab the flag !
                 self.flag           = flag
                 flag.is_on_tank     = True
