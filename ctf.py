@@ -48,6 +48,8 @@ def collision_bullet_box(arb, space, data):
     if box.parent.destructable:
         if bullet.parent in game_objects_list:
             #bullet_list.remove(bullet.parent)
+            explosion = pygame.mixer.Sound("data/explosion.wav")
+            pygame.mixer.Sound.play(explosion)
             box_list.remove(box.parent)
             game_objects_list.remove(bullet.parent)
             game_objects_list.remove(box.parent)
@@ -71,6 +73,8 @@ def collision_bullet_tank(arb, space, data):
         return False
     tank.body.position = tank.parent.start_position
     if bullet.parent in game_objects_list:
+        explosion = pygame.mixer.Sound("data/explosion.wav")
+        pygame.mixer.Sound.play(explosion)
         #bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
         space.remove(bullet, bullet.body)

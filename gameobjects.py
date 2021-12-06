@@ -230,6 +230,8 @@ class Tank(GamePhysicsObject):
             # Check if the tank is close to the flag
             flag_pos = pymunk.Vec2d(flag.x, flag.y)
             if((flag_pos - self.body.position).length < 0.5):
+                pick_flag = pygame.mixer.Sound("data/pick_flag.wav")
+                pygame.mixer.Sound.play(pick_flag)
                 # Grab the flag !
                 self.flag           = flag
                 flag.is_on_tank     = True
