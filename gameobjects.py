@@ -137,6 +137,7 @@ class Tank(GamePhysicsObject):
     NORMAL_MAX_SPEED = 2.0
     FLAG_MAX_SPEED = NORMAL_MAX_SPEED * 0.5
     shoot_tick = 60
+
     def __init__(self, x, y, orientation, sprite, space):
         super().__init__(x, y, orientation, sprite, space, True)
         # Define variable used to apply motion to the tanks
@@ -162,19 +163,27 @@ class Tank(GamePhysicsObject):
 
     def stop_moving(self):
         """ Call this function to make the tank stop moving. """
+        tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
+        pygame.mixer.Sound.play(tank_acc)
         self.acceleration  = 0
         self.body.velocity = pymunk.Vec2d.zero()
 
     def decelerate(self):
         """ Call this function to make the tank move backward. """
+        tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
+        pygame.mixer.Sound.play(tank_acc)
         self.acceleration = -1
 
     def turn_left(self):
         """ Makes the tank turn left (counter clock-wise). """
+        tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
+        pygame.mixer.Sound.play(tank_turn)
         self.rotation = -1
 
     def turn_right(self):
         """ Makes the tank turn right (clock-wise). """
+        tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
+        pygame.mixer.Sound.play(tank_turn)
         self.rotation = 1
 
     def stop_turning(self):
@@ -238,6 +247,8 @@ class Tank(GamePhysicsObject):
         self.shooting = True
         self.shoot_tick = 0
         self.tank = tank
+        shoot_sound = pygame.mixer.Sound("data/tank_shoot.wav")
+        pygame.mixer.Sound.play(shoot_sound)
         return Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle), self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space,tank)
 
 

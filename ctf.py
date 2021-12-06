@@ -29,7 +29,7 @@ FRAMERATE = 60
 
 #-- Variables
 #   Define the current level
-current_map         = maps.map1
+current_map         = maps.map0
 #   List of all game objects
 game_objects_list   = []
 tanks_list          = []
@@ -178,6 +178,8 @@ def create_tanks_and_bases():
 flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
 game_objects_list.append(flag)
 
+bg_music = pygame.mixer.music.load("data/music.wav")
+pygame.mixer.music.play(-1)
 
 # main loop
 def main_loop():
