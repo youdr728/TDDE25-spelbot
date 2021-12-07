@@ -14,9 +14,9 @@ def load_image(file):
 
 
 TILE_SIZE = 40 # Define the default size of tiles
- 
+
 explosion = load_image('explosion.png') # Image of an explosion
- 
+
 grass     = load_image('grass.png') # Image of a grass tile
 
 rockbox   = load_image('rockbox.png') # Image of a rock box (wall)
