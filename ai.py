@@ -172,7 +172,8 @@ class Ai:
         return Vec2d(int(x), int(y))
 
     def get_tile_neighbors(self, coord_vec):
-        """ Returns all bordering grid squares of the input coordinate.
+        """
+        Returns all bordering grid squares of the input coordinate.
             A bordering square is only considered accessible if it is grass
             or a wooden box.
         """

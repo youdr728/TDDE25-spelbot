@@ -146,6 +146,7 @@ class Tank(GamePhysicsObject):
         self.shape.parent = self
         self.shape.collision_type = 2
         self.shooting = False
+        self.spawn_protection = 150
 
 
 
@@ -163,26 +164,42 @@ class Tank(GamePhysicsObject):
 
     def stop_moving(self):
         """ Call this function to make the tank stop moving. """
+<<<<<<< HEAD
         tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
+=======
+        #tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
+>>>>>>> d4c13ccb7e7594b0637e6f4854ac7148be3a8260
         #pygame.mixer.Sound.play(tank_acc)
         self.acceleration  = 0
         self.body.velocity = pymunk.Vec2d.zero()
 
     def decelerate(self):
         """ Call this function to make the tank move backward. """
+<<<<<<< HEAD
         tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
+=======
+        #tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
+>>>>>>> d4c13ccb7e7594b0637e6f4854ac7148be3a8260
         #pygame.mixer.Sound.play(tank_acc)
         self.acceleration = -1
 
     def turn_left(self):
         """ Makes the tank turn left (counter clock-wise). """
+<<<<<<< HEAD
         tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
+=======
+        #tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
+>>>>>>> d4c13ccb7e7594b0637e6f4854ac7148be3a8260
         #pygame.mixer.Sound.play(tank_turn)
         self.rotation = -1
 
     def turn_right(self):
         """ Makes the tank turn right (clock-wise). """
+<<<<<<< HEAD
         tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
+=======
+        #tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
+>>>>>>> d4c13ccb7e7594b0637e6f4854ac7148be3a8260
         #pygame.mixer.Sound.play(tank_turn)
         self.rotation = 1
 
@@ -211,6 +228,7 @@ class Tank(GamePhysicsObject):
 
     def post_update(self):
         self.shoot_tick = self.shoot_tick + 1
+        self.spawn_protection -= 1
         # If the tank carries the flag, then update the positon of the flag
         if(self.flag != None):
             self.flag.x           = self.body.position[0]
@@ -230,8 +248,8 @@ class Tank(GamePhysicsObject):
             # Check if the tank is close to the flag
             flag_pos = pymunk.Vec2d(flag.x, flag.y)
             if((flag_pos - self.body.position).length < 0.5):
-                pick_flag = pygame.mixer.Sound("data/pick_flag.wav")
-                pygame.mixer.Sound.play(pick_flag)
+                #pick_flag = pygame.mixer.Sound("data/pick_flag.wav")
+                #pygame.mixer.Sound.play(pick_flag)
 
                 # Grab the flag !
                 self.flag           = flag
@@ -250,8 +268,8 @@ class Tank(GamePhysicsObject):
         self.shooting = True
         self.shoot_tick = 0
         self.tank = tank
-        shoot_sound = pygame.mixer.Sound("data/tank_shoot.wav")
-        pygame.mixer.Sound.play(shoot_sound)
+        #shoot_sound = pygame.mixer.Sound("data/tank_shoot.wav")
+        #pygame.mixer.Sound.play(shoot_sound)
         return Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle), self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space,tank)
 
 
