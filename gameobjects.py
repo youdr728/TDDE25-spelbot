@@ -164,26 +164,26 @@ class Tank(GamePhysicsObject):
     def stop_moving(self):
         """ Call this function to make the tank stop moving. """
         tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
-        pygame.mixer.Sound.play(tank_acc)
+        #pygame.mixer.Sound.play(tank_acc)
         self.acceleration  = 0
         self.body.velocity = pymunk.Vec2d.zero()
 
     def decelerate(self):
         """ Call this function to make the tank move backward. """
         tank_acc = pygame.mixer.Sound("data/tank_acc.wav")
-        pygame.mixer.Sound.play(tank_acc)
+        #pygame.mixer.Sound.play(tank_acc)
         self.acceleration = -1
 
     def turn_left(self):
         """ Makes the tank turn left (counter clock-wise). """
         tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
-        pygame.mixer.Sound.play(tank_turn)
+        #pygame.mixer.Sound.play(tank_turn)
         self.rotation = -1
 
     def turn_right(self):
         """ Makes the tank turn right (clock-wise). """
         tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
-        pygame.mixer.Sound.play(tank_turn)
+        #pygame.mixer.Sound.play(tank_turn)
         self.rotation = 1
 
     def stop_turning(self):

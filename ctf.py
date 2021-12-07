@@ -48,15 +48,18 @@ def collision_bullet_box(arb, space, data):
     if box.parent.destructable:
         if bullet.parent in game_objects_list:
             #bullet_list.remove(bullet.parent)
-            explosion = pygame.mixer.Sound("data/explosion.wav")
-            pygame.mixer.Sound.play(explosion)
+            wood_break_sfx = pygame.mixer.Sound("data/wood_box_break.wav")
+            pygame.mixer.Sound.play(wood_break_sfx)
             box_list.remove(box.parent)
             game_objects_list.remove(bullet.parent)
             game_objects_list.remove(box.parent)
             space.remove(bullet, bullet.body)
             space.remove(box, box.body)
     else:
+
         if bullet.parent in game_objects_list:
+            other_box_sfx = pygame.mixer.Sound("data/other_box_sfx.wav")
+            pygame.mixer.Sound.play(other_box_sfx)
             #bullet_list.remove(bullet.parent)
             game_objects_list.remove(bullet.parent)
             space.remove(bullet, bullet.body)
@@ -183,7 +186,7 @@ flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[
 game_objects_list.append(flag)
 
 bg_music = pygame.mixer.music.load("data/music.wav")
-pygame.mixer.music.play(-1)
+#pygame.mixer.music.play(-1)
 
 # main loop
 def main_loop():
