@@ -47,25 +47,19 @@ def collision_bullet_box(arb, space, data):
 
     if box.parent.destructable:
         if bullet.parent in game_objects_list:
-            #bullet_list.remove(bullet.parent)
-<<<<<<< HEAD
             wood_break_sfx = pygame.mixer.Sound("data/wood_box_break.wav")
             pygame.mixer.Sound.play(wood_break_sfx)
-=======
-            #explosion = pygame.mixer.Sound("data/explosion.wav")
-            #pygame.mixer.Sound.play(explosion)
->>>>>>> d4c13ccb7e7594b0637e6f4854ac7148be3a8260
+
             box_list.remove(box.parent)
             game_objects_list.remove(bullet.parent)
             game_objects_list.remove(box.parent)
             space.remove(bullet, bullet.body)
             space.remove(box, box.body)
     else:
-
         if bullet.parent in game_objects_list:
             other_box_sfx = pygame.mixer.Sound("data/other_box_sfx.wav")
             pygame.mixer.Sound.play(other_box_sfx)
-            #bullet_list.remove(bullet.parent)
+
             game_objects_list.remove(bullet.parent)
             space.remove(bullet, bullet.body)
 
@@ -79,8 +73,8 @@ def collision_bullet_tank(arb, space, data):
     bullet = arb.shapes[1]
     if bullet.parent.tank == tank.parent:
         return False
-    
-    if bullet.parent in game_objects_list and tank.parent.spawn_protection <= 0: 
+
+    if bullet.parent in game_objects_list and tank.parent.spawn_protection <= 0:
         tank.body.position = tank.parent.start_position
         #explosion = pygame.mixer.Sound("data/explosion.wav")
         #pygame.mixer.Sound.play(explosion)
@@ -192,11 +186,7 @@ def create_tanks_and_bases():
 flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
 game_objects_list.append(flag)
 
-<<<<<<< HEAD
-bg_music = pygame.mixer.music.load("data/music.wav")
-=======
 #bg_music = pygame.mixer.music.load("data/music.wav")
->>>>>>> d4c13ccb7e7594b0637e6f4854ac7148be3a8260
 #pygame.mixer.music.play(-1)
 
 # main loop
