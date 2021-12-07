@@ -29,7 +29,7 @@ FRAMERATE = 60
 
 #-- Variables
 #   Define the current level
-current_map         = maps.map1
+current_map         = maps.map0
 #   List of all game objects
 game_objects_list   = []
 tanks_list          = []
@@ -48,6 +48,8 @@ def collision_bullet_box(arb, space, data):
     if box.parent.destructable:
         if bullet.parent in game_objects_list:
             #bullet_list.remove(bullet.parent)
+            #explosion = pygame.mixer.Sound("data/explosion.wav")
+            #pygame.mixer.Sound.play(explosion)
             box_list.remove(box.parent)
             game_objects_list.remove(bullet.parent)
             game_objects_list.remove(box.parent)
@@ -69,11 +71,15 @@ def collision_bullet_tank(arb, space, data):
     bullet = arb.shapes[1]
     if bullet.parent.tank == tank.parent:
         return False
-    tank.body.position = tank.parent.start_position
-    if bullet.parent in game_objects_list:
+    
+    if bullet.parent in game_objects_list and tank.parent.spawn_protection <= 0: 
+        tank.body.position = tank.parent.start_position
+        #explosion = pygame.mixer.Sound("data/explosion.wav")
+        #pygame.mixer.Sound.play(explosion)
         #bullet_list.remove(bullet.parent)
         game_objects_list.remove(bullet.parent)
         space.remove(bullet, bullet.body)
+        tank.parent.spawn_protection = 150
     if tank.parent.flag == flag:
         gameobjects.Tank.drop_flag(tank.parent, flag)
 
@@ -178,6 +184,8 @@ def create_tanks_and_bases():
 flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
 game_objects_list.append(flag)
 
+#bg_music = pygame.mixer.music.load("data/music.wav")
+#pygame.mixer.music.play(-1)
 
 # main loop
 def main_loop():
@@ -244,10 +252,10 @@ def main_loop():
             if tanks_list[i].has_won():
                 running = False
 
-        for ai in ai_list:
-            ai.decide()
+        #for ai in ai_list:
+         #   ai.decide()
 
-        tile_neighbors = ai_list[0].get_tile_neighbors(tanks_list[0].body.position)
+        #tile_neighbors = ai_list[0].get_tile_neighbors(tanks_list[0].body.position)
 
         #-- Update physics
         if skip_update == 0:
