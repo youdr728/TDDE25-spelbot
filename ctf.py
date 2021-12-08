@@ -75,8 +75,9 @@ def collision_bullet_tank(arb, space, data):
     bullet = arb.shapes[1]
     if bullet.parent.tank == tank.parent:
         return False
-    tank.body.position = tank.parent.start_position
-    if bullet.parent in game_objects_list:
+    if bullet.parent in game_objects_list and tank.parent.spawn_protection <= 0:
+        tank.body.position = tank.parent.start_position
+        tank.parent.spawn_protection = 150
         explosion = pygame.mixer.Sound("data/explosion.wav")
         pygame.mixer.Sound.play(explosion)
         #bullet_list.remove(bullet.parent)
@@ -254,10 +255,9 @@ def main_loop():
             if tanks_list[i].has_won():
                 running = False
 
-        for ai in ai_list:
-            ai.decide()
+        #for ai in ai_list:
+        #    ai.decide()
 
-        tile_neighbors = ai_list[0].get_tile_neighbors(tanks_list[0].body.position)
 
         #-- Update physics
         if skip_update == 0:
