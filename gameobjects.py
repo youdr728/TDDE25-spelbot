@@ -147,6 +147,7 @@ class Tank(GamePhysicsObject):
         self.shape.collision_type = 2
         self.shooting = False
         self.spawn_protection = 150
+        self.tank_hp = 0
 
 
 
@@ -249,14 +250,16 @@ class Tank(GamePhysicsObject):
         """ Check if the current tank has won (if it is has the flag and it is close to its start position). """
         return self.flag != None and (self.start_position - self.body.position).length < 0.2
 
-    def shoot(self, space,tank):
+    def shoot(self, space, tank, game_objects_list):
         """ Call this function to shoot a missile (current implementation does nothing ! you need to implement it yourself) """
         self.shooting = True
-        self.shoot_tick = 0
         self.tank = tank
         shoot_sound = pygame.mixer.Sound("data/tank_shoot.wav")
         pygame.mixer.Sound.play(shoot_sound)
-        return Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle), self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space,tank)
+        if tank.shoot_tick >= 60:
+            self.shoot_tick = 0
+            game_objects_list.append(Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle),\
+                self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space,tank))
 
 
 class Box(GamePhysicsObject):
@@ -269,6 +272,7 @@ class Box(GamePhysicsObject):
         self.destructable = destructable
         self.shape.parent = self
         self.shape.collision_type = 3
+        self.box_hp = 0
 
 def get_box_with_type(x, y, type, space):
     (x, y) = (x + 0.5, y + 0.5) # Offsets the coordinate to the center of the tile
@@ -304,6 +308,21 @@ class Flag(GameVisibleObject):
     def __init__(self, x, y):
         self.is_on_tank   = False
         super().__init__(x, y,  images.flag)
+
+class Explosion(GameVisibleObject):
+    """ This class extends GameVisibleObject for representing explosion."""
+
+    def __init__(self, x, y, game_objects_list):
+        self.is_on_tank   = False
+        super().__init__(x, y,  images.explosion)
+        self.time = 50
+        self.game_objects_list = game_objects_list
+        game_objects_list.append(self)
+
+    def post_update(self):
+        self.time -= 1
+        if self.time <= 0:
+            self.game_objects_list.remove(self)
 
 class Bullet(GamePhysicsObject):
 

@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 from pygame.color import *
 import pymunk
+import sys
 
 #----- Initialisation -----#
 
@@ -28,6 +29,7 @@ import maps
 FRAMERATE = 60
 
 #-- Variables
+argument = sys.argv[1]
 #   Define the current level
 current_map         = maps.map0
 #   List of all game objects
@@ -46,15 +48,19 @@ def collision_bullet_box(arb, space, data):
     bullet = arb.shapes[1]
 
     if box.parent.destructable:
+        box.parent.box_hp += 1
         if bullet.parent in game_objects_list:
             #bullet_list.remove(bullet.parent)
             wood_break_sfx = pygame.mixer.Sound("data/wood_box_break.wav")
             pygame.mixer.Sound.play(wood_break_sfx)
-            box_list.remove(box.parent)
             game_objects_list.remove(bullet.parent)
-            game_objects_list.remove(box.parent)
             space.remove(bullet, bullet.body)
+        if box.parent.box_hp == 2:
+            box.parent.box_hp = 0
+            box_list.remove(box.parent)
+            game_objects_list.remove(box.parent)
             space.remove(box, box.body)
+            explosion = gameobjects.Explosion(box.body.position[0], box.body.position[1], game_objects_list)
     else:
 
         if bullet.parent in game_objects_list:
@@ -75,14 +81,22 @@ def collision_bullet_tank(arb, space, data):
     bullet = arb.shapes[1]
     if bullet.parent.tank == tank.parent:
         return False
-    if bullet.parent in game_objects_list and tank.parent.spawn_protection <= 0:
-        tank.body.position = tank.parent.start_position
-        tank.parent.spawn_protection = 150
-        explosion = pygame.mixer.Sound("data/explosion.wav")
-        pygame.mixer.Sound.play(explosion)
-        #bullet_list.remove(bullet.parent)
+
+    if tank.parent.spawn_protection <= 0:
+        tank.parent.tank_hp += 1
+        print(tank.parent.tank_hp)
+        if tank.parent.tank_hp == 3:
+            tank.parent.tank_hp = 0
+            tank.parent.spawn_protection = 150
+            explosion = gameobjects.Explosion(tank.body.position[0], tank.body.position[1], game_objects_list)
+            tank.body.position = tank.parent.start_position
+            explosion = pygame.mixer.Sound("data/explosion.wav")
+            pygame.mixer.Sound.play(explosion)
+
+    if bullet.parent in game_objects_list:
         game_objects_list.remove(bullet.parent)
         space.remove(bullet, bullet.body)
+
     if tank.parent.flag == flag:
         gameobjects.Tank.drop_flag(tank.parent, flag)
 
@@ -175,12 +189,16 @@ def create_tanks_and_bases():
         # Create the tank, images.tanks contains the image representing the tank
         tank = gameobjects.Tank(pos[0], pos[1], pos[2], images.tanks[i], space)
         # Add the tank to the list of tanks
-        AI = ai.Ai(tank, game_objects_list, tanks_list, space, current_map)
-        ai_list.append(AI)
         tanks_list.append(tank)
         starttime.append(0)
         game_objects_list.append(base)
         game_objects_list.append(tank)
+        if argument == "--singleplayer" and i >= 1:
+                AI = ai.Ai(tank, game_objects_list, tanks_list[i], space, current_map)
+                ai_list.append(AI)
+        if argument == "--hot-multiplayer" and i >= 2:
+                AI = ai.Ai(tank, game_objects_list, tanks_list[i], space, current_map)
+                ai_list.append(AI)
 
 #-- Create the flag
 
@@ -190,70 +208,151 @@ game_objects_list.append(flag)
 #bg_music = pygame.mixer.music.load("data/music.wav")
 #pygame.mixer.music.play(-1)
 
+'''
+def player1_assign():
+    event = pygame.event.get()
+    if event.type == KEYDOWN:
+        if event.key == K_UP:
+            tanks_list[0].accelerate()
+        if event.key == K_DOWN:
+            tanks_list[0].decelerate()
+        if event.key == K_RIGHT:
+            tanks_list[0].turn_right()
+        if event.key == K_LEFT:
+            tanks_list[0].turn_left()
+        if event.type == KEYUP:
+            if (event.key == K_DOWN or event.key == K_UP):
+                tanks_list[0].stop_moving()
+            if (event.key == K_RIGHT or event.key == K_LEFT):
+                tanks_list[0].stop_turning()
+        if event.type == KEYDOWN:
+            if event.key == K_RETURN:
+                    bullet = tanks_list[0].shoot(space,tanks_list[0])
+                    game_objects_list.append(bullet)
+                    bullet_list.append(bullet)
+def player2_assign():
+    event = pygame.event.get()
+    if event.type == KEYDOWN:                if event.type == KEYDOWN:
+                    if event.key == K_UP:
+                        tanks_list[0].accelerate()
+                    if event.key == K_DOWN:
+                        tanks_list[0].decelerate()
+                    if event.key == K_RIGHT:
+                        tanks_list[0].turn_right()
+                    if event.key == K_LEFT:
+                        tanks_list[0].turn_left()
+                if event.type == KEYUP:
+                    if (event.key == K_DOWN or event.key == K_UP):
+                        tanks_list[0].stop_moving()
+                    if (event.key == K_RIGHT or event.key == K_LEFT):
+                        tanks_list[0].stop_turning()
+                if event.type == KEYDOWN:
+                    if event.key == K_RETURN:
+                        bullet = tanks_list[0].shoot(space,tanks_list[0])
+                        bullet_list.append(bullet)
+        if event.key == K_w:
+            tanks_list[1].accelerate()
+        if event.key == K_s:
+            tanks_list[1].decelerate()
+        if event.key == K_d:
+            tanks_list[1].turn_right()
+        if event.key == K_a:
+            tanks_list[1].turn_left()
+    if event.type == KEYUP:
+        if (event.key == K_w or event.key == K_s):
+            tanks_list[1].stop_moving()
+        if (event.key == K_d or event.key == K_a):
+            tanks_list[1].stop_turning()
+    if event.key == K_SPACE:
+        if tanks_list[1].shoot_tick >= 60:
+            bullet = tanks_list[1].shoot(space, tanks_list[1])
+            game_objects_list.append(bullet)
+            bullet_list.append(bullet)
+'''
+
 # main loop
 def main_loop():
     #-- Control whether the game run
     running = True
     skip_update = 0
     while running:
+        #try:
         #-- Handle the events
         for event in pygame.event.get():
             # Check if we receive a QUIT event (for instance, if the user press the
             # close button of the wiendow) or if the user press the escape key.
             if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 running = False
-            if event.type == KEYDOWN:
-                if event.key == K_w:
-                    tanks_list[1].accelerate()
-                if event.key == K_s:
-                    tanks_list[1].decelerate()
-                if event.key == K_d:
-                    tanks_list[1].turn_right()
-                if event.key == K_a:
-                    tanks_list[1].turn_left()
-                if event.key == K_UP:
-                    tanks_list[0].accelerate()
-                if event.key == K_DOWN:
-                    tanks_list[0].decelerate()
-                if event.key == K_RIGHT:
-                    tanks_list[0].turn_right()
-                if event.key == K_LEFT:
-                    tanks_list[0].turn_left()
-            if event.type == KEYUP:
-                if (event.key == K_DOWN or event.key == K_UP):
-                    tanks_list[0].stop_moving()
-                if (event.key == K_RIGHT or event.key == K_LEFT):
-                    tanks_list[0].stop_turning()
-                if (event.key == K_w or event.key == K_s):
-                    tanks_list[1].stop_moving()
-                if (event.key == K_d or event.key == K_a):
-                    tanks_list[1].stop_turning()
-            if event.type == KEYDOWN:
-                if event.key == K_RSHIFT:
-                    if tanks_list[0].shoot_tick >= 60:
-                        bullet = tanks_list[0].shoot(space,tanks_list[0])
-                        game_objects_list.append(bullet)
-                        bullet_list.append(bullet)
+
+            if argument == "--singleplayer":
+
+                if event.type == KEYDOWN:
+                    if event.key == K_UP:
+                        tanks_list[0].accelerate()
+                    if event.key == K_DOWN:
+                        tanks_list[0].decelerate()
+                    if event.key == K_RIGHT:
+                        tanks_list[0].turn_right()
+                    if event.key == K_LEFT:
+                        tanks_list[0].turn_left()
+                if event.type == KEYUP:
+                    if (event.key == K_DOWN or event.key == K_UP):
+                        tanks_list[0].stop_moving()
+                    if (event.key == K_RIGHT or event.key == K_LEFT):
+                        tanks_list[0].stop_turning()
+                if event.type == KEYDOWN:
+                    if event.key == K_RETURN:
+                        tanks_list[0].shoot(space, tanks_list[0], game_objects_list)
+
+
+            if argument == "--hot-multiplayer":
+
+                if event.type == KEYDOWN:
+                    if event.key == K_UP:
+                        tanks_list[0].accelerate()
+                    if event.key == K_DOWN:
+                        tanks_list[0].decelerate()
+                    if event.key == K_RIGHT:
+                        tanks_list[0].turn_right()
+                    if event.key == K_LEFT:
+                        tanks_list[0].turn_left()
+                if event.type == KEYUP:
+                    if (event.key == K_DOWN or event.key == K_UP):
+                        tanks_list[0].stop_moving()
+                    if (event.key == K_RIGHT or event.key == K_LEFT):
+                        tanks_list[0].stop_turning()
+                if event.type == KEYDOWN:
+                    if event.key == K_RETURN:
+                        tanks_list[0].shoot(space,tanks_list[0], game_objects_list)
 
 
 
-                if event.key == K_LSHIFT:
-                    if tanks_list[1].shoot_tick >= 60:
-                        bullet = tanks_list[1].shoot(space)
-                        game_objects_list.append(bullet)
-                        bullet_list.append(bullet)
-                if event.key == K_c:
-                    pass
-                if event.key == K_x:
-                    pass
+                if event.type == KEYDOWN:
+                    if event.key == K_w:
+                        tanks_list[1].accelerate()
+                    if event.key == K_s:
+                        tanks_list[1].decelerate()
+                    if event.key == K_d:
+                        tanks_list[1].turn_right()
+                    if event.key == K_a:
+                        tanks_list[1].turn_left()
+                if event.type == KEYUP:
+                    if (event.key == K_s or event.key == K_w):
+                        tanks_list[1].stop_moving()
+                    if (event.key == K_d or event.key == K_a):
+                        tanks_list[1].stop_turning()
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        tanks_list[1].shoot(space, tanks_list[1], game_objects_list)
 
-        tanks_list[0].try_grab_flag(flag)
-        tanks_list[1].try_grab_flag(flag)
 
         for i in range(len(tanks_list)):
             tanks_list[i].try_grab_flag(flag)
             if tanks_list[i].has_won():
                 running = False
+
+        #for ai in ai_list:
+            #ai.decide()
 
         #for ai in ai_list:
         #    ai.decide()

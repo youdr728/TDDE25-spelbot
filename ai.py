@@ -47,9 +47,8 @@ class Ai:
 
     def decide(self):
         """ Main decision function that gets called on every tick of the game. """
-        if self.maybe_shoot() and self.tank.shoot_tick >= 60:
-            bullet = self.tank.shoot(self.space,self.tank)
-            self.game_objects_list.append(bullet)
+        if self.maybe_shoot():
+            self.tank.shoot(self.space, self.tank, self.game_objects_list)
 
         next(self.move_cycle)
 
@@ -74,6 +73,7 @@ class Ai:
 
 
         return False
+
 
 
 
@@ -118,7 +118,7 @@ class Ai:
                 distance = self.tank.body.position.get_distance(next_coord+(0.5, 0.5))
                 yield
             self.tank.stop_moving()
-            continue
+
 
     def find_shortest_path(self):
         """ A simple Breadth First Search using integer coordinates as our nodes.
