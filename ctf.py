@@ -30,6 +30,7 @@ FRAMERATE = 60
 
 #-- Variables
 argument = sys.argv[1]
+fog_of_war = True
 #   Define the current level
 current_map         = maps.map0
 #   List of all game objects
@@ -351,12 +352,8 @@ def main_loop():
             if tanks_list[i].has_won():
                 running = False
 
-        #for ai in ai_list:
-            #ai.decide()
-
-        #for ai in ai_list:
-        #    ai.decide()
-
+        for ai in ai_list:
+            ai.decide()
 
         #-- Update physics
         if skip_update == 0:
@@ -387,6 +384,20 @@ def main_loop():
         for obj in game_objects_list:
             obj.update_screen(screen)
 
+
+        #Fog of War
+        if fog_of_war:
+            colour = (0, 0, 0)
+            fog_screen = pygame.Surface(current_map.rect().size)
+            fog_screen.fill(colour)
+            pygame.draw.circle(fog_screen, (50, 50, 50), tanks_list[0].body.position * \
+             current_map.rect().size[0] // current_map.width, 150)
+
+            if argument == "--hot-multiplayer":
+                pygame.draw.circle(fog_screen, (50, 50, 50), tanks_list[1].body.position * \
+                    currentmap.rect().size[1] // current_map.width, 150)
+            fog_screen.set_colorkey((50, 50, 50))
+            screen.blit(fog_screen, (0, 0))
 
 
         # Update the display of the game objects on the screen
