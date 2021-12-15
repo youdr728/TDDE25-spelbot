@@ -27,7 +27,7 @@ class Ai:
     a breadth first search. Also capable of shooting other tanks and or wooden
     boxes. """
 
-    def __init__(self, tank,  game_objects_list, tanks_list, space, currentmap):
+    def __init__(self, tank, game_objects_list, tanks_list, space, currentmap):
         self.tank               = tank
         self.game_objects_list  = game_objects_list
         self.tanks_list         = tanks_list
@@ -39,8 +39,10 @@ class Ai:
         self.path = deque()
         self.move_cycle = self.move_cycle_gen()
         self.update_grid_pos()
-
         self.walk_metal = False
+        self.tank.ACCELERATION = self.tank.ACCELERATION*5.0
+        self.tank.max_speed = self.tank.max_speed*6.0
+
     def update_grid_pos(self):
         """ This should only be called in the beginning, or at the end of a move_cycle. """
         self.grid_pos = self.get_tile_of_position(self.tank.body.position)
@@ -49,7 +51,6 @@ class Ai:
         """ Main decision function that gets called on every tick of the game. """
         if self.maybe_shoot():
             self.tank.shoot(self.space, self.tank, self.game_objects_list)
-
         next(self.move_cycle)
 
 

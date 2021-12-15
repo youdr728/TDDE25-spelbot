@@ -138,7 +138,7 @@ class Tank(GamePhysicsObject):
     # Constant values for the tank, acessed like: Tank.ACCELERATION
     # You can add more constants here if needed later
     ACCELERATION = 0.4
-    NORMAL_MAX_SPEED = 5.0
+    NORMAL_MAX_SPEED = 3.5
     FLAG_MAX_SPEED = NORMAL_MAX_SPEED * 0.5
     shoot_tick = 60
 
@@ -152,9 +152,6 @@ class Tank(GamePhysicsObject):
         self.shooting = False
         self.spawn_protection = 150
         self.tank_hp = 0
-
-
-
         self.flag                 = None                      # This variable is used to access the flag object, if the current tank is carrying the flag
         self.max_speed        = Tank.NORMAL_MAX_SPEED     # Impose a maximum speed to the tank
         self.start_position       = pymunk.Vec2d(x, y)        # Define the start position, which is also the position where the tank has to return with the flag
@@ -244,6 +241,7 @@ class Tank(GamePhysicsObject):
                 self.flag           = flag
                 flag.is_on_tank     = True
                 self.max_speed  = Tank.FLAG_MAX_SPEED
+
     def drop_flag(self, flag):
         self.flag = None
         flag.is_on_tank = False
@@ -260,7 +258,7 @@ class Tank(GamePhysicsObject):
             tank_shoot_sound.play()
             self.shoot_tick = 0
             game_objects_list.append(Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle),\
-                self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space,tank))
+                self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space, tank))
 
 
 class Box(GamePhysicsObject):
@@ -327,13 +325,14 @@ class Explosion(GameVisibleObject):
 
 class Bullet(GamePhysicsObject):
 
-    def __init__(self, x, y, orientation, sprite, space,tank):
+    def __init__(self, x, y, orientation, sprite, space, tank):
         super().__init__(x, y, orientation, sprite, space, True)
         self.acceleration = 1 # 1 forward, 0 for stand still, -1 for backwards
         self.VELOCITY = 5
         self.shape.parent = self
         self.shape.collision_type = 1
         self.tank = tank
+
     def update(self):
         """ A function to update the objects coordinates. Gets called at every tick of the game. """
 

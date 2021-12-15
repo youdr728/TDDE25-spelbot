@@ -18,6 +18,9 @@ space = pymunk.Space()
 space.gravity = (0.0,  0.0)
 space.damping = 0.1 # Adds friction to the ground for all objects
 
+#-- Initialise
+pygame.display.set_caption('Capture The Flag')
+font = pygame.font.SysFont("Arial", 30)
 
 #-- Import from the ctf framework
 import ai
@@ -345,7 +348,6 @@ def main_loop():
                 if event.type == KEYDOWN:
                     if event.key == K_SPACE:
                         tanks_list[1].shoot(space, tanks_list[1], game_objects_list)
-
 
         for i in range(len(tanks_list)):
             tanks_list[i].try_grab_flag(flag)
