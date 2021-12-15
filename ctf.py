@@ -41,6 +41,14 @@ bullet_list         = []
 box_list            = []
 starttime           = []
 
+# Load all sounds
+wood_break_sound = pygame.mixer.Sound(images.wood_break_sfx)
+other_box_break_sound = pygame.mixer.Sound(images.other_box_sfx)
+explosion_sound = pygame.mixer.Sound(images.explosion_sfx)
+wood_break_sound.set_volume(0.1)
+other_box_break_sound.set_volume(0.1)
+explosion_sound.set_volume(0.1)
+
 #-- Resize the screen to the size of the current level
 screen = pygame.display.set_mode(current_map.rect().size)
 
@@ -51,9 +59,7 @@ def collision_bullet_box(arb, space, data):
     if box.parent.destructable:
         box.parent.box_hp += 1
         if bullet.parent in game_objects_list:
-            #bullet_list.remove(bullet.parent)
-            wood_break_sfx = pygame.mixer.Sound("data/wood_box_break.wav")
-            pygame.mixer.Sound.play(wood_break_sfx)
+            wood_break_sound.play()
             game_objects_list.remove(bullet.parent)
             space.remove(bullet, bullet.body)
         if box.parent.box_hp == 2:
@@ -63,12 +69,8 @@ def collision_bullet_box(arb, space, data):
             space.remove(box, box.body)
             explosion = gameobjects.Explosion(box.body.position[0], box.body.position[1], game_objects_list)
     else:
-
         if bullet.parent in game_objects_list:
-            other_box_sfx = pygame.mixer.Sound("data/other_box_sfx.wav")
-            pygame.mixer.Sound.play(other_box_sfx)
-
-            #bullet_list.remove(bullet.parent)
+            other_box_break_sound.play()
             game_objects_list.remove(bullet.parent)
             space.remove(bullet, bullet.body)
 
@@ -87,12 +89,11 @@ def collision_bullet_tank(arb, space, data):
         tank.parent.tank_hp += 1
         print(tank.parent.tank_hp)
         if tank.parent.tank_hp == 3:
+            explosion_sound.play()
             tank.parent.tank_hp = 0
             tank.parent.spawn_protection = 150
             explosion = gameobjects.Explosion(tank.body.position[0], tank.body.position[1], game_objects_list)
             tank.body.position = tank.parent.start_position
-            explosion = pygame.mixer.Sound("data/explosion.wav")
-            pygame.mixer.Sound.play(explosion)
 
     if bullet.parent in game_objects_list:
         game_objects_list.remove(bullet.parent)
@@ -305,7 +306,6 @@ def main_loop():
                     if event.key == K_RETURN:
                         tanks_list[0].shoot(space, tanks_list[0], game_objects_list)
 
-
             if argument == "--hot-multiplayer":
 
                 if event.type == KEYDOWN:
@@ -395,7 +395,7 @@ def main_loop():
 
             if argument == "--hot-multiplayer":
                 pygame.draw.circle(fog_screen, (50, 50, 50), tanks_list[1].body.position * \
-                    currentmap.rect().size[1] // current_map.width, 150)
+                    current_map.rect().size[1] // current_map.width, 150)
             fog_screen.set_colorkey((50, 50, 50))
             screen.blit(fog_screen, (0, 0))
 

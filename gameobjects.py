@@ -5,6 +5,10 @@ import math
 
 DEBUG = False # Change this to set it in debug mode
 
+pick_flag_sound = pygame.mixer.Sound(images.pick_flag_sfx)
+tank_shoot_sound = pygame.mixer.Sound(images.tank_shoot_sfx)
+pick_flag_sound.set_volume(0.1)
+tank_shoot_sound.set_volume(0.1)
 
 def physics_to_display(x):
     """ This function is used to convert coordinates in the physic engine into the display coordinates """
@@ -185,7 +189,6 @@ class Tank(GamePhysicsObject):
 
     def turn_right(self):
         """ Makes the tank turn right (clock-wise). """
-        tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
         #tank_turn = pygame.mixer.Sound("data/tank_turn.wav")
         #pygame.mixer.Sound.play(tank_turn)
         self.rotation = 1
@@ -235,8 +238,7 @@ class Tank(GamePhysicsObject):
             # Check if the tank is close to the flag
             flag_pos = pymunk.Vec2d(flag.x, flag.y)
             if((flag_pos - self.body.position).length < 0.5):
-                pick_flag = pygame.mixer.Sound("data/pick_flag.wav")
-                pygame.mixer.Sound.play(pick_flag)
+                pick_flag_sound.play()
 
                 # Grab the flag !
                 self.flag           = flag
@@ -254,9 +256,8 @@ class Tank(GamePhysicsObject):
         """ Call this function to shoot a missile (current implementation does nothing ! you need to implement it yourself) """
         self.shooting = True
         self.tank = tank
-        shoot_sound = pygame.mixer.Sound("data/tank_shoot.wav")
-        pygame.mixer.Sound.play(shoot_sound)
         if tank.shoot_tick >= 60:
+            tank_shoot_sound.play()
             self.shoot_tick = 0
             game_objects_list.append(Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle),\
                 self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space,tank))

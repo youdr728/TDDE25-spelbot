@@ -12,9 +12,27 @@ def load_image(file):
         raise SystemExit('Could not load image "%s" %s'%(file, pygame.get_error()))
     return surface.convert_alpha()
 
+def load_sound(file):
+    """ Loads a sound from the data directory"""
+    file = os.path.join(main_dir, 'data', file)
+    return file
 
 TILE_SIZE = 40 # Define the default size of tiles
 
+"""SFX"""
+wood_break_sfx = load_sound("wood_box_break.wav") # SFX of wood breaking
+
+other_box_sfx = load_sound("other_box_sfx.wav") # SFX of ricocheting bullets
+
+explosion_sfx = load_sound("explosion.wav") # SFX of explosion
+
+flag_sfx = load_sound("pick_flag.wav") # SFX of picking up flag
+
+tank_shoot_sfx = load_sound("tank_shoot.wav") # SFX of shooting
+
+pick_flag_sfx = load_sound("pick_flag.wav")
+
+"""Images"""
 explosion = load_image('explosion.png') # Image of an explosion
 
 grass     = load_image('grass.png') # Image of a grass tile

@@ -71,11 +71,7 @@ class Ai:
                 elif isinstance(box_or_tank.shape.parent, gameobjects.Tank):
                     return True
 
-
         return False
-
-
-
 
 
     def move_cycle_gen (self):
