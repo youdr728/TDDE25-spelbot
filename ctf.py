@@ -33,9 +33,9 @@ FRAMERATE = 60
 
 #-- Variables
 argument = sys.argv[1]
-fog_of_war = True
+fog_of_war = False
 #   Define the current level
-current_map         = maps.map0
+current_map         = maps.map2
 #   List of all game objects
 game_objects_list   = []
 tanks_list          = []
@@ -354,8 +354,8 @@ def main_loop():
             if tanks_list[i].has_won():
                 running = False
 
-        for ai in ai_list:
-            ai.decide()
+        #for ai in ai_list:
+            #ai.decide()
 
         #-- Update physics
         if skip_update == 0:
