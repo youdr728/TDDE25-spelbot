@@ -140,7 +140,6 @@ class Tank(GamePhysicsObject):
     ACCELERATION = 0.4
     NORMAL_MAX_SPEED = 3.5
     FLAG_MAX_SPEED = NORMAL_MAX_SPEED * 0.5
-    shoot_tick = 60
 
     def __init__(self, x, y, orientation, sprite, space):
         super().__init__(x, y, orientation, sprite, space, True)
@@ -149,13 +148,12 @@ class Tank(GamePhysicsObject):
         self.rotation = 0 # 1 clockwise, 0 for no rotation, -1 counter clockwise
         self.shape.parent = self
         self.shape.collision_type = 2
-        self.shooting = False
         self.spawn_protection = 150
         self.tank_hp = 0
         self.flag                 = None                      # This variable is used to access the flag object, if the current tank is carrying the flag
         self.max_speed        = Tank.NORMAL_MAX_SPEED     # Impose a maximum speed to the tank
         self.start_position       = pymunk.Vec2d(x, y)        # Define the start position, which is also the position where the tank has to return with the flag
-
+        self.shoot_tick = 60
         self.time_since_last_shot = pygame.time.get_ticks()
 
 
@@ -252,7 +250,6 @@ class Tank(GamePhysicsObject):
 
     def shoot(self, space, tank, game_objects_list):
         """ Call this function to shoot a missile (current implementation does nothing ! you need to implement it yourself) """
-        self.shooting = True
         self.tank = tank
         if tank.shoot_tick >= 60:
             tank_shoot_sound.play()
@@ -324,7 +321,9 @@ class Explosion(GameVisibleObject):
             self.game_objects_list.remove(self)
 
 class Bullet(GamePhysicsObject):
-
+    '''
+    extends from GamePhysicsObject and handles aspects of a bullet
+    '''
     def __init__(self, x, y, orientation, sprite, space, tank):
         super().__init__(x, y, orientation, sprite, space, True)
         self.acceleration = 1 # 1 forward, 0 for stand still, -1 for backwards
@@ -338,12 +337,13 @@ class Bullet(GamePhysicsObject):
 
         # Creates a vector in the direction we want accelerate / decelerate
         acceleration_vector = pymunk.Vec2d(0, self.VELOCITY).rotated(self.body.angle)
+
         # Applies the vector to our velocity
         self.body.velocity += acceleration_vector
 
         # Makes sure that we dont exceed our speed limit
         velocity = self.VELOCITY
         self.body.velocity = pymunk.Vec2d(velocity, 0).rotated(self.body.velocity.angle)
-        ''' set angle in init, remove the velocity vector'''
+
         # Updates the rotation
         self.body.angular_velocity = 0
