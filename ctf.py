@@ -38,8 +38,10 @@ except:
     raise IndexError("Missing 1 Argument (--singleplayer or --hot-multiplayer)")
     sys.exit()
 fog_of_war = False
+
 #   Define the current level
 current_map         = maps.map0
+
 #   List of all game objects
 game_objects_list   = []
 tanks_list          = []
@@ -179,7 +181,6 @@ def create_tanks_and_bases():
             ai_list.append(AI)
 
 #-- Create the flag
-
 flag = gameobjects.Flag(current_map.flag_position[0], current_map.flag_position[1])
 game_objects_list.append(flag)
 
@@ -222,7 +223,7 @@ def main_loop():
                         tanks_list[0].shoot(space, tanks_list[0], game_objects_list)
 
             if argument == "--hot-multiplayer":
-
+                #player one
                 if event.type == KEYDOWN:
                     if event.key == K_UP:
                         tanks_list[0].accelerate()
@@ -241,8 +242,7 @@ def main_loop():
                     if event.key == K_RETURN:
                         tanks_list[0].shoot(space,tanks_list[0], game_objects_list)
 
-
-
+                #player two
                 if event.type == KEYDOWN:
                     if event.key == K_w:
                         tanks_list[1].accelerate()
@@ -261,11 +261,13 @@ def main_loop():
                     if event.key == K_SPACE:
                         tanks_list[1].shoot(space, tanks_list[1], game_objects_list)
 
+        #tank capture the flag
         for i in range(len(tanks_list)):
             tanks_list[i].try_grab_flag(flag)
             if tanks_list[i].has_won():
                 running = False
 
+        #start the ai
         for ai in ai_list:
             ai.decide()
 
@@ -304,7 +306,7 @@ def main_loop():
             fog_screen.fill(colour)
             pygame.draw.circle(fog_screen, (50, 50, 50), tanks_list[0].body.position * \
              current_map.rect().size[0] // current_map.width, 150)
-
+            #for second player
             if argument == "--hot-multiplayer":
                 pygame.draw.circle(fog_screen, (50, 50, 50), tanks_list[1].body.position * \
                     current_map.rect().size[1] // current_map.width, 150)
