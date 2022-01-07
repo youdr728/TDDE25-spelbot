@@ -194,6 +194,3 @@ class Ai:
                 if self.currentmap.boxAt(coord[0], coord[1]) in walkable:
                     return True
         return False
-
-
-SimpleAi = Ai # Legacy
