@@ -42,6 +42,7 @@ class Ai:
         self.walk_metal = False
         self.tank.ACCELERATION = self.tank.ACCELERATION*5.0
         self.tank.max_speed = self.tank.max_speed*6.0
+        self.tank.tank_hp = -2
 
     def update_grid_pos(self):
         """ This should only be called in the beginning, or at the end of a move_cycle. """
