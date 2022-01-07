@@ -18,10 +18,6 @@ space = pymunk.Space()
 space.gravity = (0.0,  0.0)
 space.damping = 0.1 # Adds friction to the ground for all objects
 
-#-- Initialise
-pygame.display.set_caption('Capture The Flag')
-font = pygame.font.SysFont("Arial", 30)
-
 #-- Import from the ctf framework
 import ai
 import images
