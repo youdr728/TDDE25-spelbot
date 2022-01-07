@@ -1,18 +1,18 @@
-import images
+import media
 import pygame
 import pymunk
 import math
 
 DEBUG = False # Change this to set it in debug mode
 
-pick_flag_sound = pygame.mixer.Sound(images.pick_flag_sfx)
-tank_shoot_sound = pygame.mixer.Sound(images.tank_shoot_sfx)
+pick_flag_sound = pygame.mixer.Sound(media.pick_flag_sfx)
+tank_shoot_sound = pygame.mixer.Sound(media.tank_shoot_sfx)
 pick_flag_sound.set_volume(0.1)
 tank_shoot_sound.set_volume(0.1)
 
 def physics_to_display(x):
     """ This function is used to convert coordinates in the physic engine into the display coordinates """
-    return x * images.TILE_SIZE
+    return x * media.TILE_SIZE
 
 
 class GameObject:
@@ -71,8 +71,8 @@ class GamePhysicsObject(GameObject):
         super().__init__(sprite)
 
         # Half dimensions of the object converted from screen coordinates to physic coordinates
-        half_width          = 0.5 * self.sprite.get_width() / images.TILE_SIZE
-        half_height         = 0.5 * self.sprite.get_height() / images.TILE_SIZE
+        half_width          = 0.5 * self.sprite.get_width() / media.TILE_SIZE
+        half_height         = 0.5 * self.sprite.get_height() / media.TILE_SIZE
 
         # Physical objects have a rectangular shape, the points correspond to the corners of that shape.
         points              = [[-half_width, -half_height],
@@ -255,7 +255,7 @@ class Tank(GamePhysicsObject):
             tank_shoot_sound.play()
             self.shoot_tick = 0
             game_objects_list.append(Bullet(self.body.position[0] - 0.5*math.sin(self.body.angle),\
-                self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), images.bullet, space, tank))
+                self.body.position[1] + 0.5*math.cos(self.body.angle), math.degrees(self.body.angle), media.bullet, space, tank))
 
 
 class Box(GamePhysicsObject):
@@ -273,11 +273,11 @@ class Box(GamePhysicsObject):
 def get_box_with_type(x, y, type, space):
     (x, y) = (x + 0.5, y + 0.5) # Offsets the coordinate to the center of the tile
     if type == 1: # Creates a non-movable non-destructable rockbox
-        return Box(x, y, images.rockbox, False, space, False)
+        return Box(x, y, media.rockbox, False, space, False)
     if type == 2: # Creates a movable destructable woodbox
-        return Box(x, y, images.woodbox, True, space, True)
+        return Box(x, y, media.woodbox, True, space, True)
     if type == 3: # Creates a movable non-destructable metalbox
-        return Box(x, y, images.metalbox, True, space, False)
+        return Box(x, y, media.metalbox, True, space, False)
 
 
 
@@ -303,14 +303,14 @@ class Flag(GameVisibleObject):
 
     def __init__(self, x, y):
         self.is_on_tank   = False
-        super().__init__(x, y,  images.flag)
+        super().__init__(x, y,  media.flag)
 
 class Explosion(GameVisibleObject):
     """ This class extends GameVisibleObject for representing explosion."""
 
     def __init__(self, x, y, game_objects_list):
         self.is_on_tank   = False
-        super().__init__(x, y,  images.explosion)
+        super().__init__(x, y,  media.explosion)
         self.time = 50
         self.game_objects_list = game_objects_list
         game_objects_list.append(self)

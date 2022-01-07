@@ -1,4 +1,4 @@
-import images
+import media
 import pygame
 
 
@@ -16,7 +16,7 @@ class Map:
     self.flag_position      = flag_position
 
   def rect(self):
-    return pygame.Rect(0, 0, images.TILE_SIZE*self.width,  images.TILE_SIZE*self.height)
+    return pygame.Rect(0, 0, media.TILE_SIZE*self.width,  media.TILE_SIZE*self.height)
 
   def boxAt(self, x, y):
     """ Return the type of the box at coordinates (x, y). """

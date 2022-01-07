@@ -20,7 +20,7 @@ space.damping = 0.1 # Adds friction to the ground for all objects
 
 #-- Import from the ctf framework
 import ai
-import images
+import media
 import gameobjects
 import maps
 
@@ -45,9 +45,9 @@ ai_list             = []
 starttime           = []
 
 # Load all sounds
-wood_break_sound = pygame.mixer.Sound(images.wood_break_sfx)
-other_box_break_sound = pygame.mixer.Sound(images.other_box_sfx)
-explosion_sound = pygame.mixer.Sound(images.explosion_sfx)
+wood_break_sound = pygame.mixer.Sound(media.wood_break_sfx)
+other_box_break_sound = pygame.mixer.Sound(media.other_box_sfx)
+explosion_sound = pygame.mixer.Sound(media.explosion_sfx)
 wood_break_sound.set_volume(0.1)
 other_box_break_sound.set_volume(0.1)
 explosion_sound.set_volume(0.1)
@@ -133,9 +133,9 @@ background = pygame.Surface(screen.get_size())
 for x in range(0, current_map.width):
     for y in range(0,  current_map.height):
         # The call to the function "blit" will copy the image
-        # contained in "images.grass" into the "background"
+        # contained in "media.grass" into the "background"
         # image at the coordinates given as the second argument
-        background.blit(images.grass,  (x*images.TILE_SIZE, y*images.TILE_SIZE))
+        background.blit(media.grass,  (x*media.TILE_SIZE, y*media.TILE_SIZE))
 
 
 #-- Create the boxes
@@ -161,9 +161,9 @@ def create_tanks_and_bases():
         # Get the starting position of the tank "i"
         pos = current_map.start_positions[i]
         #create bases
-        base = gameobjects.GameVisibleObject(pos[0], pos[1], images.bases[i])
-        # Create the tank, images.tanks contains the image representing the tank
-        tank = gameobjects.Tank(pos[0], pos[1], pos[2], images.tanks[i], space)
+        base = gameobjects.GameVisibleObject(pos[0], pos[1], media.bases[i])
+        # Create the tank, media.tanks contains the image representing the tank
+        tank = gameobjects.Tank(pos[0], pos[1], pos[2], media.tanks[i], space)
         # Add the tank to the list of tanks
         tanks_list.append(tank)
         starttime.append(0)
